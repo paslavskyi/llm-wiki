@@ -59,6 +59,32 @@ export async function validateNotes(rootDir) {
     }
   }
 
+  // 4. parent/topic must resolve to an existing topic note
+  const topicIds = new Set(
+    notes.filter(n => n.frontmatter.type === 'topic' && n.frontmatter.id)
+         .map(n => n.frontmatter.id)
+  );
+  for (const note of notes) {
+    const fm = note.frontmatter;
+    const who = fm.id ?? note.fileName;
+    const parent = fm.parent;
+    if (typeof parent === 'string') {
+      if (!ids.has(parent)) {
+        errors.push(`${who}: parent → ${parent} does not exist`);
+      } else if (!topicIds.has(parent)) {
+        errors.push(`${who}: parent → ${parent} must point to a topic note`);
+      }
+    }
+    const topic = fm.topic;
+    if (typeof topic === 'string') {
+      if (!ids.has(topic)) {
+        errors.push(`${who}: topic → ${topic} does not exist`);
+      } else if (!topicIds.has(topic)) {
+        errors.push(`${who}: topic → ${topic} must point to a topic note`);
+      }
+    }
+  }
+
   return { errors };
 }
 
