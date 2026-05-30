@@ -20,6 +20,16 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node tools/user-prompt-hook.mjs"
+          }
+        ]
+      }
     ]
   }
 }
