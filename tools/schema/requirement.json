@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "requirement",
+  "type": "object",
+  "required": ["id", "type", "title", "status", "summary", "priority", "category"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^(FR|NFR)-[0-9]+$" },
+    "type": { "enum": ["requirement", "nfr"] },
+    "title": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["draft", "proposed", "accepted", "deprecated"] },
+    "summary": { "type": "string", "minLength": 1 },
+    "priority": { "enum": ["must", "should", "could", "wont"] },
+    "category": { "enum": ["functional", "non-functional"] },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "links": { "type": "array", "items": { "type": "string" } },
+    "created": { "type": "string" },
+    "updated": { "type": "string" },
+    "superseded_by": { "type": ["string", "null"] }
+  }
+}
