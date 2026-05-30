@@ -1,9 +1,9 @@
 import { join } from 'node:path';
-import { readFile, writeFile, rm } from 'node:fs/promises';
+import { writeFile, rm } from 'node:fs/promises';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { parseKnowledgeChanges } from '../lib/git-status.mjs';
-import { ageHours, nextMarkerState } from '../lib/dirty-marker.mjs';
+import { ageHours, nextMarkerState, readMarker } from '../lib/dirty-marker.mjs';
 import { loadConfig } from '../lib/config.mjs';
 
 export function decide({ changes, oldestDirtyMs, lastRemindMs, now, config }) {
@@ -24,10 +24,6 @@ export function decide({ changes, oldestDirtyMs, lastRemindMs, now, config }) {
 }
 
 // --- CLI: run git, manage .git markers, print decision JSON ---
-async function readMarker(path) {
-  try { return Number(await readFile(path, 'utf8')) || null; } catch { return null; }
-}
-
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const root = process.cwd();
   const config = (await loadConfig(root)).persistence;

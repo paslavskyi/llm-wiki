@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ageHours, nextMarkerState, shouldRemind } from '../lib/dirty-marker.mjs';
+import { join } from 'node:path';
+import { ageHours, nextMarkerState, shouldRemind, readMarker } from '../lib/dirty-marker.mjs';
+import { makeTmpDir, writeFileDeep, cleanup } from './helpers.mjs';
 
 const HOUR = 3600_000;
 
@@ -31,4 +33,36 @@ test('shouldRemind: false within the debounce window', () => {
 
 test('shouldRemind: true after the debounce window', () => {
   assert.equal(shouldRemind({ lastRemind: 0, now: 5 * HOUR, everyHours: 4 }), true);
+});
+
+test('readMarker: file containing "0" returns 0 (not null)', async () => {
+  // Regression: the old `Number(...) || null` mapped a legit epoch 0 to null.
+  const dir = await makeTmpDir();
+  try {
+    const path = join(dir, 'marker');
+    await writeFileDeep(path, '0');
+    assert.strictEqual(await readMarker(path), 0);
+  } finally {
+    await cleanup(dir);
+  }
+});
+
+test('readMarker: missing file returns null', async () => {
+  const dir = await makeTmpDir();
+  try {
+    assert.strictEqual(await readMarker(join(dir, 'does-not-exist')), null);
+  } finally {
+    await cleanup(dir);
+  }
+});
+
+test('readMarker: garbage contents return null', async () => {
+  const dir = await makeTmpDir();
+  try {
+    const path = join(dir, 'marker');
+    await writeFileDeep(path, 'abc');
+    assert.strictEqual(await readMarker(path), null);
+  } finally {
+    await cleanup(dir);
+  }
 });

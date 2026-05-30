@@ -9,13 +9,11 @@ export function classifyDelta(nameStatus, { area } = {}) {
   for (const rawLine of String(nameStatus ?? '').split('\n')) {
     const line = rawLine.replace(/\r$/, '').trim();
     if (!line) continue;
-    const tab = line.indexOf('\t');
-    if (tab === -1) continue; // non-name-status line (e.g. log subject) — skip, keep parsing
     const code = line[0];
     // rename/copy: name-status uses Rxx\told\tnew (or Cxx\told\tnew); take the last field
     const parts = line.split('\t');
-    const path = parts[parts.length - 1];
-    const norm = path.replaceAll('\\', '/');
+    if (parts.length < 2) continue; // non-name-status line (e.g. log subject) — skip, keep parsing
+    const norm = parts[parts.length - 1].replaceAll('\\', '/');
     if (!norm.startsWith(prefix) || !norm.endsWith('.md')) continue;
     if (code === 'A' || code === 'R' || code === 'C') added.push(norm);
     else if (code === 'M') updated.push(norm);
