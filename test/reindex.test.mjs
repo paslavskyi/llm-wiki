@@ -91,3 +91,36 @@ test('backlinks.json records reverse links', async () => {
     await cleanup(dir);
   }
 });
+
+test('buildIndexes emits a nested mindmap.md tree', async () => {
+  const dir = await makeTmpDir();
+  try {
+    await writeFileDeep(join(dir, 'knowledge/vision/TOP-001-vision.md'),
+      `---\nid: TOP-001\ntype: topic\ntitle: Vision\nstatus: draft\nsummary: Area.\nparent: null\n---\n`);
+    await writeFileDeep(join(dir, 'knowledge/vision/TOP-007-problem.md'),
+      `---\nid: TOP-007\ntype: topic\ntitle: Problem\nstatus: draft\nsummary: Sub.\nparent: TOP-001\n---\n`);
+    await writeFileDeep(join(dir, 'knowledge/vision/VIS-001-mission.md'),
+      `---\nid: VIS-001\ntype: vision\ntitle: Mission\nstatus: draft\nsummary: M.\ntopic: TOP-001\n---\n`);
+    const { files } = await buildIndexes(dir);
+    const mm = files['index/mindmap.md'];
+    assert.match(mm, /GENERATED/);
+    assert.match(mm, /TOP-001/);
+    assert.match(mm, /Vision/);
+    const rootIdx = mm.indexOf('TOP-001');
+    const childIdx = mm.indexOf('TOP-007');
+    assert.ok(rootIdx < childIdx, 'root appears before child');
+    assert.match(mm, /VIS-001/);
+  } finally { await cleanup(dir); }
+});
+
+test('mindmap.md shows an unassigned section when a note has no topic', async () => {
+  const dir = await makeTmpDir();
+  try {
+    await writeFileDeep(join(dir, 'knowledge/product/ENT-001-orphan.md'),
+      `---\nid: ENT-001\ntype: entity\ntitle: Orphan\nstatus: draft\nsummary: O.\n---\n`);
+    const { files } = await buildIndexes(dir);
+    const mm = files['index/mindmap.md'];
+    assert.match(mm, /unassigned/i);
+    assert.match(mm, /ENT-001/);
+  } finally { await cleanup(dir); }
+});
