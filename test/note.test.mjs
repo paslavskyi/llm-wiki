@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
 import { readNote, extractLinks } from '../lib/note.mjs';
+import { domainOf } from '../lib/domain.mjs';
 import { makeTmpDir, writeFileDeep, cleanup } from './helpers.mjs';
 
 test('extractLinks merges frontmatter links and inline [[ID]], deduped', () => {
@@ -29,4 +30,14 @@ test('readNote parses frontmatter, body, and links', async () => {
   } finally {
     await cleanup(dir);
   }
+});
+
+test('domainOf returns top-level knowledge folder', () => {
+  assert.equal(domainOf('knowledge/vision/VIS-001-x.md'), 'vision');
+  assert.equal(domainOf('knowledge/product/requirements/FR-001-x.md'), 'product');
+  assert.equal(domainOf('/abs/knowledge/gtm/POS-001-x.md'), 'gtm');
+});
+
+test('domainOf returns "unknown" when not under knowledge/', () => {
+  assert.equal(domainOf('docs/foo.md'), 'unknown');
 });
