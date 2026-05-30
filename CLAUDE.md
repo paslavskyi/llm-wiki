@@ -31,17 +31,25 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 | market | competitor, market-insight | CMP-, MKT- |
 | users | persona, segment, jtbd, pain | PER-, SEG-, JTBD-, PAIN- |
 | product | feature, requirement, nfr, story, entity, term | FEAT-, FR-, NFR-, STORY-, ENT-, TERM- |
+| mindmap | topic | TOP- |
 | roadmap | milestone, kpi | MIL-, KPI- |
 | gtm | positioning, channel, pricing, message | POS-, CHAN-, PRICE-, MSG- |
 | cross-cutting | risk, assumption, question | RISK-, ASMP-, Q- |
 
 `requirement` priority values: `must | should | could | wont`.
 
+## Mind-map (Phase 2a)
+- A `topic` note (`TOP-`) is a node of the mind-map. Its `parent` is a `TOP-` id or `null` (top-level area = a folder).
+- A concrete note attaches to a node via its `topic: TOP-xxx` field.
+- `parent`/`topic` must resolve to an existing `topic` note (validated).
+- Generated views: `index/mindmap.md` (text, auto), `index/mindmap.html` (graphical, via `kb-visualize`).
+- Dialogue engine: run **`kb-elicit`** to gather knowledge; **`kb-visualize`** to see the graphical map. Stage-0 seed is `kb.framework.yml`.
+
 ## Folder map
 - `knowledge/<domain>/...` — source notes
 - `index/` — generated (MAP, per-domain indexes, backlinks.json)
 - `tools/` — Node scripts: `validate.mjs`, `reindex.mjs`
-- `.claude/skills/` — kb-orient, kb-capture, kb-recall
+- `.claude/skills/` — kb-orient, kb-capture, kb-recall, kb-elicit, kb-visualize
 
 ## Tooling
 - `npm run validate` — validate all notes (also runs automatically after writes).
