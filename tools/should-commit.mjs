@@ -29,7 +29,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const config = (await loadConfig(root)).persistence;
   const now = Date.now();
 
-  const porcelain = execSync('git status --porcelain', { cwd: root, encoding: 'utf8' });
+  const porcelain = execSync('git status --porcelain -uall', { cwd: root, encoding: 'utf8' });
   const changes = parseKnowledgeChanges(porcelain);
   const dirty = changes.length > 0;
 

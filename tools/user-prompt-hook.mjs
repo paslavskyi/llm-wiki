@@ -13,7 +13,7 @@ const config = (await loadConfig(root)).persistence;
 if (config.autocommit === 'off') process.exit(0);
 
 const now = Date.now();
-const porcelain = execSync('git status --porcelain', { cwd: root, encoding: 'utf8' });
+const porcelain = execSync('git status --porcelain -uall', { cwd: root, encoding: 'utf8' });
 const changes = parseKnowledgeChanges(porcelain);
 const dirty = changes.length > 0;
 
