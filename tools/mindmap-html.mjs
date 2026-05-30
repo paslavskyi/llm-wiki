@@ -37,7 +37,16 @@ export async function buildMindmapHtml(rootDir) {
 
   const d3 = await readFile(join(here, 'vendor', 'd3.min.js'), 'utf8');
   const view = await readFile(join(here, 'vendor', 'markmap-view.min.js'), 'utf8');
-  const json = JSON.stringify(data);
+  // Escape HTML/line-separator metacharacters so a note title containing a
+  // literal `</script>` (or `<!--`, U+2028/U+2029) cannot break out of the
+  // inlined <script> block. These \uXXXX forms parse back to the identical
+  // string, so the rendered data is unchanged. The U+2028/U+2029 patterns
+  // are built via RegExp to keep raw line separators out of this source.
+  const json = JSON.stringify(data)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(new RegExp(' ', 'g'), '\\u2028')
+    .replace(new RegExp(' ', 'g'), '\\u2029');
 
   return `<!DOCTYPE html>
 <html lang="en">

@@ -52,3 +52,26 @@ test('empty knowledge base still produces a valid document', async () => {
     assert.match(html, /<svg id="mindmap"/);
   } finally { await cleanup(dir); }
 });
+
+test('a note title containing </script> cannot break out of the script block', async () => {
+  const dir = await makeTmpDir();
+  try {
+    // Unique nonce defeats gray-matter's in-process content cache.
+    const nonce = `nonce-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    await writeFileDeep(join(dir, 'knowledge/vision/TOP-001-vision.md'),
+      `---\nid: TOP-001\ntype: topic\ntitle: Vision\nstatus: draft\nsummary: ${nonce}\nparent: null\n---\n`);
+    await writeFileDeep(join(dir, 'knowledge/vision/VIS-001-evil.md'),
+      `---\nid: VIS-001\ntype: vision\ntitle: "Embed a </script> tag"\nstatus: draft\nsummary: ${nonce}-x\ntopic: TOP-001\n---\n`);
+
+    const html = await buildMindmapHtml(dir);
+
+    // The template emits exactly 3 legitimate closing </script> tags
+    // (vendored d3 + vendored markmap-view + the render script). The
+    // malicious title must NOT contribute a 4th.
+    const closing = (html.match(/<\/script>/g) || []).length;
+    assert.equal(closing, 3, 'malicious title must not add a closing </script> tag');
+
+    // The title must be preserved in escaped form, not dropped.
+    assert.ok(html.includes('\\u003c/script'), 'title </script> must be escaped, not removed');
+  } finally { await cleanup(dir); }
+});
