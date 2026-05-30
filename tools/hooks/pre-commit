@@ -1,0 +1,18 @@
+#!/bin/sh
+# Pre-commit guard for the knowledge base.
+# validate = hard gate; reindex + graph = informational (never block).
+set -e
+
+echo "[pre-commit] validating notes..."
+node tools/validate.mjs
+
+echo "[pre-commit] regenerating indexes..."
+node tools/reindex.mjs
+git add index/MAP.md index/backlinks.json index/mindmap.md 2>/dev/null || true
+git add index/*.index.md 2>/dev/null || true
+
+echo "[pre-commit] regenerating health report..."
+node tools/graph.mjs || true
+git add index/health.md 2>/dev/null || true
+
+echo "[pre-commit] ok"
