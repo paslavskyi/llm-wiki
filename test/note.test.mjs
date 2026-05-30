@@ -32,6 +32,22 @@ test('readNote parses frontmatter, body, and links', async () => {
   }
 });
 
+test('readNote normalizes unquoted YAML Date values to YYYY-MM-DD strings', async () => {
+  const dir = await makeTmpDir();
+  try {
+    const file = join(dir, 'VIS-001-vision.md');
+    await writeFileDeep(file,
+      '---\nid: VIS-001\ntype: vision\ntitle: T\nstatus: draft\nsummary: S\ncreated: 2026-05-30\nupdated: 2026-05-30\n---\nBody.\n');
+    const note = await readNote(file);
+    assert.equal(typeof note.frontmatter.created, 'string');
+    assert.equal(note.frontmatter.created, '2026-05-30');
+    assert.equal(typeof note.frontmatter.updated, 'string');
+    assert.equal(note.frontmatter.updated, '2026-05-30');
+  } finally {
+    await cleanup(dir);
+  }
+});
+
 test('domainOf returns top-level knowledge folder', () => {
   assert.equal(domainOf('knowledge/vision/VIS-001-x.md'), 'vision');
   assert.equal(domainOf('knowledge/product/requirements/FR-001-x.md'), 'product');

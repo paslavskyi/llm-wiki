@@ -39,6 +39,31 @@ test('clean knowledge base produces no errors', async () => {
   }
 });
 
+test('note with unquoted YAML dates validates with no errors', async () => {
+  const dir = await makeTmpDir();
+  try {
+    // Unique summary so gray-matter's in-process content cache cannot
+    // mask the Date-normalization behavior across runs.
+    const unique = `nonce-${Date.now()}-${Math.random()}`;
+    const note = `---
+id: VIS-001
+type: vision
+title: Product vision
+status: draft
+summary: ${unique}
+created: 2026-05-30
+updated: 2026-05-30
+---
+Body.
+`;
+    await writeFileDeep(join(dir, 'knowledge/vision/VIS-001-vision.md'), note);
+    const { errors } = await validateNotes(dir);
+    assert.deepEqual(errors, []);
+  } finally {
+    await cleanup(dir);
+  }
+});
+
 test('schema violation is reported', async () => {
   const dir = await makeTmpDir();
   try {
