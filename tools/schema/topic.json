@@ -1,14 +1,20 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "base",
+  "$id": "topic",
   "type": "object",
   "required": ["id", "type", "title", "status", "summary"],
   "properties": {
-    "id": { "type": "string", "pattern": "^[A-Z]+-[A-Za-z0-9-]+$" },
-    "type": { "type": "string" },
+    "id": { "type": "string", "pattern": "^TOP-[0-9]+$" },
+    "type": { "enum": ["topic"] },
     "title": { "type": "string", "minLength": 1 },
     "status": { "enum": ["draft", "proposed", "accepted", "deprecated"] },
     "summary": { "type": "string", "minLength": 1 },
+    "parent": {
+      "anyOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^TOP-[0-9]+$" }
+      ]
+    },
     "tags": { "type": "array", "items": { "type": "string" } },
     "links": { "type": "array", "items": { "type": "string" } },
     "topic": { "type": "string", "pattern": "^TOP-[0-9]+$" },

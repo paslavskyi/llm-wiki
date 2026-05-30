@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { walkMarkdown } from '../lib/walk.mjs';
 import { readNote } from '../lib/note.mjs';
 import { domainOf } from '../lib/domain.mjs';
+import { buildTree } from '../lib/mindmap.mjs';
 
 const BANNER = '<!-- GENERATED — do not edit by hand. Run: npm run reindex -->';
 
@@ -78,6 +79,28 @@ export async function buildIndexes(rootDir) {
   const ordered = {};
   for (const k of Object.keys(backlinks).sort()) ordered[k] = backlinks[k];
   files['index/backlinks.json'] = JSON.stringify(ordered, null, 2) + '\n';
+
+  // mindmap.md — nested tree from topic graph
+  const { roots, unassigned } = buildTree(notes);
+  let mm = `${BANNER}\n\n# Mind-map\n\n`;
+  const renderNode = (node, depth) => {
+    const pad = '  '.repeat(depth);
+    mm += `${pad}- **${cell(node.id)}** ${cell(node.title)}\n`;
+    for (const child of node.children) renderNode(child, depth + 1);
+    for (const n of node.notes) {
+      mm += `${'  '.repeat(depth + 1)}- ${cell(n.id)} ${cell(n.title)}\n`;
+    }
+  };
+  if (roots.length === 0 && unassigned.length === 0) {
+    mm += `_No topics yet. Run the kb-elicit skill to frame the map._\n`;
+  } else {
+    for (const root of roots) renderNode(root, 0);
+  }
+  if (unassigned.length) {
+    mm += `\n## (unassigned)\n\n`;
+    for (const n of unassigned) mm += `- ${cell(n.id)} ${cell(n.title)}\n`;
+  }
+  files['index/mindmap.md'] = mm;
 
   return { files };
 }

@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node --test",
     "validate": "node tools/validate.mjs",
-    "reindex": "node tools/reindex.mjs"
+    "reindex": "node tools/reindex.mjs",
+    "mindmap": "node tools/mindmap-html.mjs"
   },
   "dependencies": {
     "ajv": "^8.17.1",
