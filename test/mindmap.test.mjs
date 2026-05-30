@@ -46,4 +46,30 @@ test('buildTree tolerates a 2-node cycle without infinite loop', () => {
   ];
   const { roots } = buildTree(cyclic);
   assert.ok(Array.isArray(roots));
+  // Both cyclic nodes are promoted to roots deterministically, no duplication.
+  assert.deepEqual(roots.map(r => r.id).sort(), ['TOP-010', 'TOP-011']);
+});
+
+test('buildTree tolerates a 3-node cycle, promoting all three to roots once', () => {
+  const cyclic = [
+    note({ id: 'TOP-020', type: 'topic', title: 'A', parent: 'TOP-022' }),
+    note({ id: 'TOP-021', type: 'topic', title: 'B', parent: 'TOP-020' }),
+    note({ id: 'TOP-022', type: 'topic', title: 'C', parent: 'TOP-021' }),
+  ];
+  const { roots } = buildTree(cyclic);
+  assert.equal(roots.length, 3);
+  assert.deepEqual(roots.map(r => r.id).sort(), ['TOP-020', 'TOP-021', 'TOP-022']);
+});
+
+test('buildTree puts a note with a dangling topic into unassigned, not under a root', () => {
+  const notes = [
+    note({ id: 'TOP-001', type: 'topic', title: 'Vision', parent: null }),
+    note({ id: 'FR-009', type: 'requirement', title: 'X', topic: 'TOP-404' }),
+  ];
+  const { roots, unassigned } = buildTree(notes);
+  assert.ok(unassigned.some(n => n.id === 'FR-009'));
+  // It must not be attached to any topic node.
+  const collect = (node) => [...node.notes, ...node.children.flatMap(collect)];
+  const attached = roots.flatMap(collect).map(n => n.id);
+  assert.ok(!attached.includes('FR-009'));
 });

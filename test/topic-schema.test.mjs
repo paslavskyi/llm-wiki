@@ -95,3 +95,19 @@ test('topic field pointing to a non-topic note is reported', async () => {
     assert.ok(errors.some(e => /VIS-002/.test(e) && /VIS-001/.test(e) && /topic/i.test(e)));
   } finally { await cleanup(dir); }
 });
+
+test('empty-string topic yields only a schema error, not a "does not exist" line', async () => {
+  const dir = await makeTmpDir();
+  try {
+    // Unique nonce in summary defeats gray-matter's in-process content cache.
+    const nonce = `nonce-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    await writeFileDeep(join(dir, 'knowledge/vision/VIS-003-empty.md'),
+      `---\nid: VIS-003\ntype: vision\ntitle: X\nstatus: draft\nsummary: ${nonce}\ntopic: ""\n---\n`);
+    const { errors } = await validateNotes(dir);
+    const mine = errors.filter(e => /VIS-003/.test(e));
+    // No redundant "does not exist" noise for the blank target...
+    assert.equal(mine.filter(e => /does not exist/.test(e)).length, 0);
+    // ...but the schema still rejects the empty string.
+    assert.ok(mine.some(e => /schema/i.test(e)), `expected a schema error, got: ${JSON.stringify(mine)}`);
+  } finally { await cleanup(dir); }
+});

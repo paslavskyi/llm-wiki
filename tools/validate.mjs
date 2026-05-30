@@ -68,7 +68,7 @@ export async function validateNotes(rootDir) {
     const fm = note.frontmatter;
     const who = fm.id ?? note.fileName;
     const parent = fm.parent;
-    if (typeof parent === 'string') {
+    if (typeof parent === 'string' && parent) {
       if (!ids.has(parent)) {
         errors.push(`${who}: parent → ${parent} does not exist`);
       } else if (!topicIds.has(parent)) {
@@ -76,7 +76,7 @@ export async function validateNotes(rootDir) {
       }
     }
     const topic = fm.topic;
-    if (typeof topic === 'string') {
+    if (typeof topic === 'string' && topic) {
       if (!ids.has(topic)) {
         errors.push(`${who}: topic → ${topic} does not exist`);
       } else if (!topicIds.has(topic)) {
