@@ -2,3 +2,11 @@
 mode: debug          # debug | autonomous  (Phase 1: debug only; autonomous is Phase 2)
 language: uk
 owner: Andrii
+
+persistence:
+  autocommit: manual     # off | manual | auto
+  threshold: 10          # uncommitted knowledge files → action
+  max_age_hours: 24      # age of oldest uncommitted change → action
+  remind_every_hours: 4  # manual: debounce reminders (anti-noise)
+  hard_safety_net: false # optional technical auto-commit fallback
+  hard_threshold: 50     # (if hard_safety_net) higher volume threshold
