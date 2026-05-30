@@ -85,6 +85,7 @@ export async function buildHealth(rootDir, opts = {}) {
         for (let j = i + 1; j < list.length; j++) {
           const a = normalizeForCompare(list[i].frontmatter.title);
           const b = normalizeForCompare(list[j].frontmatter.title);
+          if (!a || !b) continue;
           const score = jaroWinkler(a, b);
           if (score >= threshold) {
             dupes.push({ a: list[i].frontmatter.id, b: list[j].frontmatter.id, score: score.toFixed(3) });

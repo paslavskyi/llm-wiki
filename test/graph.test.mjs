@@ -80,6 +80,39 @@ test('duplicates: off by default, on when enabled', async () => {
   } finally { await cleanup(dir); }
 });
 
+test('duplicates: punctuation-only titles (normalize to "") are NOT false duplicates', async () => {
+  const dir = await makeTmpDir();
+  try {
+    // Titles are quoted YAML strings (valid YAML) that are pure punctuation, so
+    // normalizeForCompare() reduces both to '' — the empty-vs-empty case that
+    // jaroWinkler scores 1.0. Unique summaries (nonce) dodge gray-matter's
+    // in-process content cache.
+    const nonce = Date.now().toString(36) + Math.random().toString(36).slice(2);
+    await writeFileDeep(join(dir, 'knowledge/users/PER-101-a.md'),
+      note({ id: 'PER-101', type: 'persona', title: '"---"', status: 'draft', summary: `a-${nonce}` }));
+    await writeFileDeep(join(dir, 'knowledge/users/PER-102-b.md'),
+      note({ id: 'PER-102', type: 'persona', title: '"..."', status: 'draft', summary: `b-${nonce}` }));
+    const on = await buildHealth(dir, { duplicates: true, threshold: 0.92 });
+    assert.ok(!/PER-101 ~ PER-102/.test(on.markdown),
+      'punctuation-only titles must not be reported as duplicates');
+  } finally { await cleanup(dir); }
+});
+
+test('duplicates: near-identical Cyrillic titles ARE reported when enabled', async () => {
+  const dir = await makeTmpDir();
+  try {
+    const nonce = Date.now().toString(36) + Math.random().toString(36).slice(2);
+    await writeFileDeep(join(dir, 'knowledge/users/PER-201-a.md'),
+      note({ id: 'PER-201', type: 'persona', title: 'Зайнятий батько', status: 'draft', summary: `a-${nonce}` }));
+    await writeFileDeep(join(dir, 'knowledge/users/PER-202-b.md'),
+      note({ id: 'PER-202', type: 'persona', title: 'Зайнятий батьк', status: 'draft', summary: `b-${nonce}` }));
+    const on = await buildHealth(dir, { duplicates: true, threshold: 0.92 });
+    assert.match(on.markdown, /[Pp]ossible duplicate/);
+    assert.match(on.markdown, /PER-201/);
+    assert.match(on.markdown, /PER-202/);
+  } finally { await cleanup(dir); }
+});
+
 test('health.md has GENERATED banner and is exit-0 friendly (returns string)', async () => {
   const dir = await makeTmpDir();
   try {

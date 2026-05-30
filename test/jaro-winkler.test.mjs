@@ -27,3 +27,11 @@ test('empty strings: two empties are equal, one empty is 0', () => {
 test('normalizeForCompare lowercases, trims, collapses ws, strips punctuation', () => {
   assert.equal(normalizeForCompare('  Create,  Monthly  Budget! '), 'create monthly budget');
 });
+
+test('normalizeForCompare handles Cyrillic (lowercase + strip punct + collapse ws)', () => {
+  assert.equal(normalizeForCompare('  Бюджет, на  Місяць! '), 'бюджет на місяць');
+});
+
+test('near-identical Cyrillic titles score high (>= 0.92)', () => {
+  assert.ok(jaroWinkler('зайнятий батько', 'зайнятий батьк') >= 0.92);
+});
