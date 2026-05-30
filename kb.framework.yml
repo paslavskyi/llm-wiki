@@ -1,0 +1,37 @@
+# Reusable framework seed for the dialogue engine (kb-elicit, Stage 0).
+# A recommended top-level skeleton of areas + framing questions.
+# NOT a source of truth: the map's truth lives in TOP- topic notes.
+# Fork this file to seed a different knowledge base.
+areas:
+  - key: vision
+    title: Vision
+    framing:
+      - What problem are we solving, and for whom?
+      - What is the mission / north star of the product?
+      - What does success look like in one sentence?
+  - key: market
+    title: Market
+    framing:
+      - Who are the main competitors and alternatives?
+      - What market trends or insights matter here?
+  - key: users
+    title: Users
+    framing:
+      - Who are the key personas and segments?
+      - What are their jobs-to-be-done and pains?
+  - key: product
+    title: Product
+    framing:
+      - What are the core features?
+      - What functional and non-functional requirements follow?
+      - What are the key domain entities and terms?
+  - key: roadmap
+    title: Roadmap
+    framing:
+      - What are the milestones and their horizon (now / next / later)?
+      - What KPIs measure progress?
+  - key: gtm
+    title: Go-to-market
+    framing:
+      - What is the positioning and messaging?
+      - What channels and pricing approach?
