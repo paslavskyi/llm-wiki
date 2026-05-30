@@ -1,1 +1,5 @@
 node_modules/
+
+# Generated graphical mind-map (heavy, embeds vendored libs). Regenerate with
+# the kb-visualize skill / `npm run mindmap`. Source (graph + tools/vendor) is tracked.
+index/mindmap.html
