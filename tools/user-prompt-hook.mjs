@@ -13,7 +13,13 @@ const config = (await loadConfig(root)).persistence;
 if (config.autocommit === 'off') process.exit(0);
 
 const now = Date.now();
-const porcelain = execSync('git status --porcelain -uall', { cwd: root, encoding: 'utf8' });
+let porcelain;
+try {
+  porcelain = execSync('git status --porcelain -uall', { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+} catch {
+  // git failed (transient lock, not a repo, etc.): degrade to no changes, never disrupt.
+  porcelain = '';
+}
 const changes = parseKnowledgeChanges(porcelain);
 const dirty = changes.length > 0;
 

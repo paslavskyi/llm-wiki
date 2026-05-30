@@ -29,7 +29,13 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const config = (await loadConfig(root)).persistence;
   const now = Date.now();
 
-  const porcelain = execSync('git status --porcelain -uall', { cwd: root, encoding: 'utf8' });
+  let porcelain;
+  try {
+    porcelain = execSync('git status --porcelain -uall', { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  } catch {
+    // git failed (transient lock, not a repo, etc.): degrade to no changes.
+    porcelain = '';
+  }
   const changes = parseKnowledgeChanges(porcelain);
   const dirty = changes.length > 0;
 
