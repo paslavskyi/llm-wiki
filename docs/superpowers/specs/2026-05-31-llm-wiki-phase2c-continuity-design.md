@@ -64,44 +64,59 @@ git-історія — **єдине сховище** історії змін. Н
 `oldestAgeHours` = (зараз − час у маркері). Час інжектується (узгоджено з
 обмеженням «Date.now недоступний у деяких контекстах» — CLI передає поточний час).
 
-### 2.3 Поведінка за конфігом `persistence.autocommit`
+### 2.3 Хто комітить: LLM — основний коміттер (ключове рішення)
+
+**Скрипт лишається тупим (`true/false` + факти + рівень). Осмислене повідомлення
+коміту завжди пише LLM.** Це можливо завдяки механіці UserPromptSubmit-hook:
+його stdout **вкидається в контекст LLM ДО того, як LLM починає відповідати**.
+Потік:
+
+1. Користувач шле повідомлення.
+2. Hook запускає `should-commit.mjs` → рівень (`none`/`remind`/`commit`/`hard`)
+   + факти (скільки, що змінилось).
+3. Hook друкує інструкцію в контекст (за рівнем і конфігом — див. 2.4).
+4. **LLM отримує керування, бачить інструкцію першою**, виконує `git commit` зі
+   **згенерованим LLM осмисленим повідомленням** (бо LLM знає, що робив:
+   «kb: додав 3 нотатки про персони бюджетування»), і лише тоді відповідає
+   користувачу по суті.
+
+Так у нормальному потоці технічного формату немає взагалі — коміт завжди має
+людський опис, бо LLM уже в циклі до того, як коміт стається.
+
+### 2.4 Поведінка за конфігом `persistence.autocommit`
 
 Тривимірний перемикач, **незалежний від `mode`** (`mode` = тон спілкування;
-`autocommit` = поведінка git — два окремі виміри):
+`autocommit` = поведінка git):
 
-| `autocommit` | Оцінювач запускається? | Дія при перевищенні порогів |
+| `autocommit` | Оцінювач | Дія |
 |---|---|---|
-| **`off`** | ні | нічого; git цілком на користувачеві |
-| **`manual`** | так | **тільки натякає** (`ℹ N незбережених нотаток, найстарішій Xг`); коміт ручний |
-| **`auto`** | так | **автоматичний коміт** |
+| **`off`** | не запускається | нічого; git цілком на користувачеві |
+| **`manual`** | запускається | при перевищенні порогів hook вкидає **натяк**; LLM переказує користувачу «варто закомітити»; рішення за користувачем |
+| **`auto`** | запускається | при перевищенні порогів hook вкидає **інструкцію закомітити**; LLM комічу з осмисленим повідомленням перед відповіддю |
 
-**Анти-шум для `manual` (дебаунс за часом):** натяк показується не частіше, ніж
-раз на `remind_every_hours`, навіть якщо пороги перевищені на кожному
-повідомленні. Окремий маркер часу останнього натяку (напр. `.git/kb-last-remind`);
-мовчимо, поки не мине інтервал. Без цього `manual` шумів би на кожне повідомлення.
+**Анти-шум для `manual` (дебаунс за часом):** натяк не частіше, ніж раз на
+`remind_every_hours`, навіть якщо пороги перевищені щоразу. Маркер часу останнього
+натяку (`.git/kb-last-remind`); мовчимо до завершення інтервалу.
 
-### 2.4 Автокоміт (`auto`) — `tools/auto-commit.mjs`
+### 2.5 Запобіжник «hard» (опційний, за замовчуванням ВИМКНЕНИЙ — YAGNI)
 
-Коли `auto` і пороги перевищені:
-1. `node tools/reindex.mjs` (свіжі індекси) + `node tools/graph.mjs` (health).
+Ризик: hook лише *просить* LLM закомітити; LLM теоретично може не виконати
+інструкцію (відволікся). Підстраховка: якщо борг переростає **другий, вищий**
+поріг (`hard_threshold` / значно більший вік), скрипт сам робить технічний
+автокоміт (`kb: +N notes…` з фактів), не покладаючись на LLM. Це аварійний
+рятунок, спрацьовує вкрай рідко. **За замовчуванням вимкнений**; вмикається, лише
+якщо на практиці побачимо, що LLM пропускає інструкції. `tools/auto-commit.mjs`
+реалізує цей технічний коміт (і використовується тільки тут).
+
+### 2.6 Що саме комітимо (будь-який шлях)
+
+1. (LLM або скрипт) `node tools/reindex.mjs` + `node tools/graph.mjs`.
 2. `git add knowledge/ index/` — **виключно** ці шляхи (безпека: ніякого коду/
-   секретів/іншого; blast radius мінімальний — текстова база, кожна нотатка вже
-   пройшла `validate`+atomic-write).
-3. `git commit` з авто-повідомленням із дельти (перевикористовуємо
-   `session-delta.mjs` §3): напр. `kb: +3 notes, 1 updated`.
-4. Скинути git-маркери (§2.2, §2.3).
+   секретів; кожна нотатка вже пройшла `validate`+atomic-write).
+3. `git commit` (LLM-повідомлення в нормі; технічне — лише hard-запобіжник).
+4. Скинути git-маркери (§2.2).
 
-### 2.5 UserPromptSubmit hook
-
-Новий hook у `.claude/settings.json`. Запускає `should-commit.mjs`; за
-`persistence.autocommit`:
-- `off` → no-op;
-- `manual` → якщо дебаунс дозволяє і пороги перевищені, вивести натяк (текст
-  потрапляє в контекст як нагадування);
-- `auto` → якщо пороги перевищені, виконати `auto-commit.mjs`.
-
-Рекомендовані дефолти: `manual` (безпечно — нічого не комітить само, але страхує).
-Для autonomous-розгортання сетап виставляє `auto`.
+Рекомендовані дефолти: `autocommit: manual`. Для autonomous-розгортання — `auto`.
 
 ---
 
@@ -152,6 +167,8 @@ persistence:
   threshold: 10          # незакоммічених файлів → дія (auto/manual)
   max_age_hours: 24      # вік найдавнішої незакоммічаної зміни → дія
   remind_every_hours: 4  # manual: анти-шум дебаунс натяку
+  hard_safety_net: false # §2.5 — технічний аварійний автокоміт (за замовч. вимкнено)
+  hard_threshold: 50     # (якщо hard_safety_net) другий, вищий поріг об'єму
 ```
 `lib/config.mjs` `DEFAULTS` розширюється секцією `persistence` з цими значеннями;
 глибокий мердж гарантує дефолти при відсутній/частковій секції.
@@ -164,10 +181,10 @@ persistence:
 lib/config.mjs                   # MODIFY — persistence defaults (nested merge)
 kb.config.yml                    # MODIFY — persistence section
 lib/git-status.mjs               # NEW — parse `git status --porcelain` for knowledge/ (??/M/D)
-tools/should-commit.mjs          # NEW — evaluator {shouldRemindOrCommit, reason, count, oldestAgeHours}
-tools/auto-commit.mjs            # NEW — reindex+graph + git add knowledge/ index/ + commit
+tools/should-commit.mjs          # NEW — evaluator → {level: none|remind|commit|hard, count, oldestAgeHours, facts}
+tools/auto-commit.mjs            # NEW — technical commit (HARD safety-net only); reindex+graph + git add knowledge/ index/ + commit
 tools/session-delta.mjs          # NEW — facts from git by range (since/area)
-tools/user-prompt-hook.mjs       # NEW — UserPromptSubmit entry: dispatch off/manual/auto
+tools/user-prompt-hook.mjs       # NEW — UserPromptSubmit entry: emit context instruction per off/manual/auto + hard
 .claude/settings.json            # MODIFY — add UserPromptSubmit hook
 .claude/skills/kb-recap/SKILL.md # NEW — optional read-only recap
 CLAUDE.md                        # MODIFY — document persistence + kb-recap + autocommit modes
@@ -201,14 +218,16 @@ test/session-delta.test.mjs      # NEW
 
 ---
 
-## 7. Відкриті питання (реалізаційні)
+## 7. Рішення (раніше відкриті питання)
 
-- `Q-2C-001`: формат авто-повідомлення коміту — `kb: +N notes, M updated, K deprecated`?
-  Уточнити при реалізації `auto-commit.mjs` (перевикористати факти session-delta).
-- `Q-2C-002`: як натяк `manual` потрапляє «в контекст» — UserPromptSubmit hook
-  друкує рядок, що додається до контексту LLM, який його переказує користувачу.
-  Уточнити механіку виводу hook при реалізації (узгодити з тим, як CC показує
-  UserPromptSubmit-вивід).
-- `Q-2C-003`: чи виносити автокоміт-`reindex`/`graph` у спільний крок із наявним
-  Stop-hook reindex, щоб не дублювати. Ймовірно — `auto-commit` сам викликає
-  reindex, а Stop-hook лишається для не-autocommit потоку. Вирішити при реалізації.
+- `Q-2C-001` ✅ **Вирішено:** у нормальному потоці повідомлення коміту пише
+  **LLM** (осмислене), бо UserPromptSubmit-hook вкидає інструкцію в контекст до
+  того, як LLM відповідає (§2.3). Технічний формат (`kb: +N notes…`) — лише для
+  опційного hard-запобіжника (§2.5).
+- `Q-2C-002` ✅ **Вирішено (механіка зафіксована):** UserPromptSubmit-hook друкує
+  рядок у stdout, який harness додає в контекст LLM перед відповіддю; LLM діє за
+  ним (комічу / переказую натяк). Точний канал виводу — деталь реалізації,
+  звіримось із CC docs; суті не міняє.
+- `Q-2C-003` ✅ **Вирішено:** `auto-commit.mjs` самодостатній (сам робить
+  reindex+graph); Stop-hook reindex лишається незмінним. Без передчасної спільної
+  абстракції (YAGNI) — подвійний reindex ідемпотентний і коштує мілісекунди.
