@@ -1,0 +1,4 @@
+# Knowledge base runtime config. Read first in every session.
+mode: debug          # debug | autonomous  (Phase 1: debug only; autonomous is Phase 2)
+language: uk
+owner: Andrii
