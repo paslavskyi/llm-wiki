@@ -1,4 +1,4 @@
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { walkMarkdown } from '../lib/walk.mjs';
 import { readNote } from '../lib/note.mjs';
@@ -11,7 +11,13 @@ export async function validateNotes(rootDir) {
 
   const notes = [];
   for (const file of files) {
-    const note = await readNote(file);
+    let note;
+    try {
+      note = await readNote(file);
+    } catch (e) {
+      errors.push(`${basename(file)}: invalid frontmatter — ${e.message.split('\n')[0]}`);
+      continue;
+    }
     notes.push(note);
   }
 

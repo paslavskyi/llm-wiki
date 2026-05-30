@@ -75,6 +75,25 @@ test('dangling link is reported', async () => {
   }
 });
 
+test('malformed frontmatter is reported, not thrown', async () => {
+  const dir = await makeTmpDir();
+  try {
+    // Genuinely malformed YAML. Made unique per run so gray-matter's
+    // in-process content cache cannot mask the parse throw.
+    const unique = `nonce-${Date.now()}-${Math.random()}`;
+    const broken = `---\nid: FR-001\n  : broken: : : ${unique}\n---\nBody.\n`;
+    await writeFileDeep(join(dir, 'knowledge/product/requirements/FR-001-budget.md'), broken);
+    const { errors } = await validateNotes(dir);
+    assert.ok(errors.length > 0, 'expected at least one error');
+    assert.ok(
+      errors.some(e => /FR-001-budget\.md/.test(e) && /invalid frontmatter/i.test(e)),
+      `expected an error mentioning the filename and "invalid frontmatter", got: ${JSON.stringify(errors)}`,
+    );
+  } finally {
+    await cleanup(dir);
+  }
+});
+
 test('filename not matching id is reported', async () => {
   const dir = await makeTmpDir();
   try {

@@ -7,13 +7,25 @@ import { domainOf } from '../lib/domain.mjs';
 
 const BANNER = '<!-- GENERATED — do not edit by hand. Run: npm run reindex -->';
 
+// Escape a value for safe interpolation into a Markdown table cell:
+// collapse newlines to spaces and escape pipes so a value can't split the row.
+function cell(v) {
+  return String(v ?? '').replace(/\r?\n/g, ' ').replace(/\|/g, '\\|').trim();
+}
+
 export async function buildIndexes(rootDir) {
   const knowledgeDir = join(rootDir, 'knowledge');
   const filePaths = await walkMarkdown(knowledgeDir);
 
   const notes = [];
   for (const fp of filePaths) {
-    const note = await readNote(fp);
+    let note;
+    try {
+      note = await readNote(fp);
+    } catch {
+      // Skip notes with malformed frontmatter; `validate` reports these.
+      continue;
+    }
     notes.push({ ...note, domain: domainOf(fp) });
   }
 
@@ -30,6 +42,7 @@ export async function buildIndexes(rootDir) {
   // backlinks
   const backlinks = {};
   for (const n of notes) {
+    if (!n.frontmatter.id) continue;
     for (const target of n.links) {
       (backlinks[target] ??= []).push(n.frontmatter.id);
     }
@@ -45,7 +58,7 @@ export async function buildIndexes(rootDir) {
   let map = `${BANNER}\n\n# Knowledge Map\n\nTotal notes: ${notes.length}\n\n`;
   map += `| Domain | Notes | Index |\n|---|---|---|\n`;
   for (const d of domains) {
-    map += `| ${d} | ${byDomain.get(d).length} | [${d}](./${d}.index.md) |\n`;
+    map += `| ${cell(d)} | ${byDomain.get(d).length} | [${cell(d)}](./${d}.index.md) |\n`;
   }
   map += `\nNavigation: read this MAP → open the relevant \`<domain>.index.md\` → open only the note files you need.\n`;
   files['index/MAP.md'] = map;
@@ -56,8 +69,7 @@ export async function buildIndexes(rootDir) {
     idx += `| id | title | status | priority | summary |\n|---|---|---|---|---|\n`;
     for (const n of byDomain.get(d)) {
       const fm = n.frontmatter;
-      const summary = String(fm.summary ?? '').replace(/\n/g, ' ').trim();
-      idx += `| ${fm.id} | ${fm.title ?? ''} | ${fm.status ?? ''} | ${fm.priority ?? ''} | ${summary} |\n`;
+      idx += `| ${cell(fm.id ?? '(no id)')} | ${cell(fm.title)} | ${cell(fm.status)} | ${cell(fm.priority)} | ${cell(fm.summary)} |\n`;
     }
     files[`index/${d}.index.md`] = idx;
   }

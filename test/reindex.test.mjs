@@ -59,6 +59,27 @@ test('per-domain index lists id, title, status, summary', async () => {
   }
 });
 
+test('pipe in a cell is escaped and does not split the row', async () => {
+  const dir = await makeTmpDir();
+  try {
+    const piped = `---\nid: JTBD-002\ntype: jtbd\ntitle: "Track A | B income"\nstatus: draft\nsummary: As a user I want to track A and B.\n---\n`;
+    await writeFileDeep(join(dir, 'knowledge/users/JTBD-002-pipe.md'), piped);
+    const { files } = await buildIndexes(dir);
+    const idx = files['index/users.index.md'];
+    // The pipe from the title must be escaped...
+    assert.match(idx, /Track A \\\| B income/);
+    // ...and must NOT appear as a bare, unescaped separator.
+    assert.ok(!/[^\\]\| B income/.test(idx), 'raw unescaped pipe leaked into the table');
+    // The data row should still have exactly the right number of columns (5 fields => 6 pipes).
+    const row = idx.split('\n').find(l => l.includes('JTBD-002'));
+    assert.ok(row, 'expected a row for JTBD-002');
+    const sepCount = (row.match(/(?<!\\)\|/g) || []).length;
+    assert.equal(sepCount, 6, `expected 6 column separators, got ${sepCount} in: ${row}`);
+  } finally {
+    await cleanup(dir);
+  }
+});
+
 test('backlinks.json records reverse links', async () => {
   const dir = await makeTmpDir();
   try {
