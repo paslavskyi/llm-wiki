@@ -23,12 +23,17 @@ response and update only this note.
   take the highest existing number for that prefix, +1. Zero-pad to 3 digits
   (e.g., `FR-007`).
 
-## Step 3 — WRITE
-- Filename: `knowledge/<domain>/<ID>-<slug>.md` (slug = short kebab title).
-- Frontmatter required fields: `id, type, title, status, summary`
-  (+ `priority, category` for requirement/nfr). Set `status: draft`,
-  `created`/`updated` to today's date, `links` to related ids.
-- Body: the actual content / acceptance criteria. Inline links as `[[ID]]`.
+## Step 3 — WRITE (through the write pipeline)
+- Filename target: `knowledge/<domain>/<ID>-<slug>.md` (slug = kebab of title; the
+  write pipeline derives it).
+- Build the note "intent" (frontmatter required fields: `id, type, title, status,
+  summary` + `priority, category` for requirement/nfr; `parent` for topic; plus
+  `links`, body). Set `status: draft` for new notes.
+- Write via the atomic write pipeline `tools/write-note.mjs` (NOT a raw Write):
+  it reconstructs the note to a healthy state (rule_set: sets `updated`, preserves
+  `created`, resolves any deprecated refs to live ids, dedupes links, removes
+  self-refs, keeps unknown fields verbatim) and writes atomically.
+- Do NOT hand-edit `index/`.
 
 ## Step 4 — VERIFY
 - The PostToolUse hook runs `node tools/validate.mjs` automatically. If it reports

@@ -23,6 +23,12 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 - Every note has a stable `id`; once assigned, an id is never reused or deleted.
 - A note's filename must start with its `id` (e.g., `FR-001-budget.md`).
 - Capture knowledge only via `kb-capture`; do not hand-write notes ad hoc.
+- All note writes go through the write pipeline (`tools/write-note.mjs` via
+  `kb-capture`/`kb-evolve`); never raw-write or hand-edit notes. Every write
+  reconstructs the note to a healthy state (rule_set in `lib/heal.mjs`).
+- To retire a note, deprecate it (`status: deprecated` + `superseded_by`) — never
+  reuse or delete an id. Same-prefix change = rename-in-place; different-prefix =
+  tombstone migration (see `kb-evolve`).
 
 ## Type & ID vocabulary
 | Domain | type | ID prefix |
@@ -45,11 +51,20 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 - Generated views: `index/mindmap.md` (text, auto), `index/mindmap.html` (graphical, via `kb-visualize`).
 - Dialogue engine: run **`kb-elicit`** to gather knowledge; **`kb-visualize`** to see the graphical map. Stage-0 seed is `kb.framework.yml`.
 
+## Health & evolution (Phase 2b)
+- `index/health.md` (GENERATED) reports actionable signals: migration debt, open
+  `Q-`/`RISK-`/`ASMP-`, empty topic nodes; plus heuristic orphans (and opt-in
+  duplicates via `kb.config.yml` `health.duplicates`). Regenerate: `npm run graph`.
+- `npm run impact -- <ID>` shows a note's blast radius before evolving it.
+- `npm run install-hooks` installs the git pre-commit guard (validate = gate;
+  reindex + graph = informational).
+- Evolve notes with **`kb-evolve`**; clear migration debt in bulk with **`kb-sanitize`**.
+
 ## Folder map
 - `knowledge/<domain>/...` — source notes
 - `index/` — generated (MAP, per-domain indexes, backlinks.json)
 - `tools/` — Node scripts: `validate.mjs`, `reindex.mjs`
-- `.claude/skills/` — kb-orient, kb-capture, kb-recall, kb-elicit, kb-visualize
+- `.claude/skills/` — kb-orient, kb-capture, kb-recall, kb-elicit, kb-visualize, kb-evolve, kb-sanitize
 
 ## Tooling
 - `npm run validate` — validate all notes (also runs automatically after writes).
