@@ -60,6 +60,20 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
   reindex + graph = informational).
 - Evolve notes with **`kb-evolve`**; clear migration debt in bulk with **`kb-sanitize`**.
 
+## Persistence & recap (Phase 2c)
+- Persistence is automatic and invisible: a UserPromptSubmit hook evaluates
+  uncommitted `knowledge/` changes (untracked/modified/deleted) every message.
+  Per `kb.config.yml` `persistence.autocommit`: `off` (silent), `manual` (nudge
+  you to commit; debounced), `auto` (the hook instructs me to commit with a
+  meaningful message before replying). `mode` (tone) and `autocommit` (git
+  behavior) are independent.
+- When the hook asks for a commit, commit `knowledge/` + `index/` with a concise
+  message describing what changed. (An optional `hard_safety_net` makes a
+  technical commit only if reminders are repeatedly ignored; off by default.)
+- **`kb-recap`** (optional, read-only): summarize changes over a time range or
+  area from git history. It saves nothing — git is the only history store. There
+  is no `journal/`.
+
 ## Folder map
 - `knowledge/<domain>/...` — source notes
 - `index/` — generated (MAP, per-domain indexes, backlinks.json)

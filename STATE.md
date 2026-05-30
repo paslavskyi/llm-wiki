@@ -3,7 +3,7 @@
 > Read this first (after `kb.config.yml`) at the start of every session, then run the `kb-orient` skill.
 
 ## Phase
-Phase 2b complete (evolution & integrity). Health report, atomic write pipeline, and kb-evolve/kb-sanitize are available.
+Phase 2c complete (continuity). Automatic persistence (UserPromptSubmit hook) and the optional read-only `kb-recap` are available. Infrastructure (Phases 1, 2a, 2b, 2c) is complete — ready to capture knowledge.
 
 ## Progress by domain
 (no knowledge captured yet)
