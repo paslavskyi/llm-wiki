@@ -1,4 +1,5 @@
 {
   "requirement": "requirement.json",
-  "nfr": "requirement.json"
+  "nfr": "requirement.json",
+  "topic": "topic.json"
 }
