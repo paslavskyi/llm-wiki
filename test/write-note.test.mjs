@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
 import { readFile, readdir, writeFile } from 'node:fs/promises';
-import { writeNote, buildSupersededIndex } from '../tools/write-note.mjs';
+import { writeNote, buildSupersededIndex, targetPathFor } from '../tools/write-note.mjs';
 import { readNote } from '../lib/note.mjs';
 import { makeTmpDir, writeFileDeep, cleanup } from './helpers.mjs';
 
@@ -79,6 +79,16 @@ test('B6: raw file has id as the first frontmatter key, in KEY_ORDER', async () 
     assert.ok(keys.indexOf('created') < keys.indexOf('updated'), 'created before updated');
     assert.ok(keys.includes('updated'));
   } finally { await cleanup(dir); }
+});
+
+test('targetPathFor: empty slug (all-punctuation title) falls back to id', () => {
+  const p = targetPathFor('/root', 'product', 'FR-007', '!!!');
+  assert.ok(p.endsWith('FR-007-fr-007.md'), `expected fallback slug, got ${p}`);
+});
+
+test('targetPathFor: normal title still slugifies', () => {
+  const p = targetPathFor('/root', 'product', 'FR-007', 'Create budget');
+  assert.ok(p.endsWith('FR-007-create-budget.md'), `expected slugified path, got ${p}`);
 });
 
 test('round-trip: written dates are plain YYYY-MM-DD strings', async () => {

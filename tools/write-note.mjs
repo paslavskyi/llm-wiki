@@ -92,5 +92,6 @@ let _c = 0;
 function attemptCounter() { return (_c = (_c + 1) % 1e6); }
 
 export function targetPathFor(rootDir, domainDir, id, title) {
-  return join(rootDir, 'knowledge', domainDir, `${id}-${slugify(title)}.md`);
+  const slug = slugify(title) || String(id).toLowerCase();
+  return join(rootDir, 'knowledge', domainDir, `${id}-${slug}.md`);
 }

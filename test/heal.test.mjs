@@ -75,3 +75,15 @@ test('B6: frontmatter key order is deterministic (id first, updated near id bloc
   assert.equal(keys[0], 'id');
   assert.ok(keys.indexOf('type') < keys.indexOf('summary'));
 });
+
+test('healNote: returned frontmatter shares no array references with input intent', () => {
+  const inputTags = ['a', 'b'];
+  const withTags = { ...base, frontmatter: { ...base.frontmatter, tags: inputTags } };
+  const { frontmatter } = healNote(withTags, ctx());
+  // mutating the RETURNED tags must not affect the original intent
+  frontmatter.tags.push('c');
+  assert.equal(inputTags.length, 2, 'original intent tags must be unchanged');
+  // and mutating the INPUT array after the call must not affect the returned object
+  inputTags.push('d');
+  assert.equal(frontmatter.tags.length, 3, 'returned tags must not reflect later input mutation');
+});
