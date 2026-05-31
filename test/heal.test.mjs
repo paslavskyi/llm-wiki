@@ -87,3 +87,24 @@ test('healNote: returned frontmatter shares no array references with input inten
   inputTags.push('d');
   assert.equal(frontmatter.tags.length, 3, 'returned tags must not reflect later input mutation');
 });
+
+test('healNote: topic with parent:null (top-level) is valid, not "missing"', () => {
+  const note = {
+    frontmatter: { id: 'TOP-001', type: 'topic', title: 'Проблема',
+      status: 'accepted', summary: 'S', parent: null },
+    body: 'Area.',
+  };
+  const ctx = { existing: null, supersededIndex: new Map(), today: '2026-05-31' };
+  const { frontmatter } = healNote(note, ctx);
+  assert.equal(frontmatter.id, 'TOP-001');
+  assert.equal(frontmatter.parent, null);
+});
+
+test('healNote: topic with parent key absent still throws (truly missing)', () => {
+  const note = {
+    frontmatter: { id: 'TOP-009', type: 'topic', title: 'X', status: 'draft', summary: 'S' },
+    body: '',
+  };
+  const ctx = { existing: null, supersededIndex: new Map(), today: '2026-05-31' };
+  assert.throws(() => healNote(note, ctx), /parent/);
+});
