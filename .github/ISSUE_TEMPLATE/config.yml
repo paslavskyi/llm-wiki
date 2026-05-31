@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Showcase / questions
+    url: https://github.com/paslavskyi/llm-wiki/discussions
+    about: Built a knowledge base from this template, or have a usage question? Start a discussion.

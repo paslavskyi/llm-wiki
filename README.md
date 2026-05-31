@@ -1,5 +1,11 @@
 # LLM_Wiki — База знань про продукт / Product Knowledge Base
 
+> **🧩 This is a GitHub template.** An LLM-native, session-free knowledge base:
+> talk to an AI in plain language, it captures your knowledge as validated,
+> interlinked notes. Ships empty — fork it and fill it with your own domain.
+> **New here? → [GETTING_STARTED.md](GETTING_STARTED.md)** (requirements, setup,
+> first session).
+
 > 🇺🇦 [Інструкція українською](#-інструкція-українською) · 🇬🇧 [English guide](#-english-guide)
 
 ---
