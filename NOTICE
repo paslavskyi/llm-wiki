@@ -1,0 +1,10 @@
+LLM_Wiki — third-party notices
+================================
+
+This project is licensed under the MIT License (see LICENSE).
+
+It includes vendored third-party browser assets under `tools/vendor/`, each
+retaining its own license (see `tools/vendor/README.md` for versions and source):
+
+- d3 — BSD-3-Clause — https://github.com/d3/d3
+- markmap-view — MIT — https://github.com/markmap/markmap
