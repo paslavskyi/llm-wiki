@@ -1,4 +1,4 @@
-# abc-budget — LLM-native product knowledge base
+# LLM-Wiki — LLM-native product knowledge base
 
 This repository is a **knowledge system**, not product code. It captures and
 systematizes everything known about the product so that specs, roadmap, KPIs,

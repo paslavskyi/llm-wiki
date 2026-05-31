@@ -2,7 +2,7 @@
 
 - **Дата:** 2026-05-30
 - **Статус:** Draft (design) — очікує review
-- **Репозиторій:** `abc-budget/requirements`
+- **Репозиторій:** `paslavskyi/llm-wiki`
 - **Спирається на:** Phase 1 + Phase 2a (merged)
 - **Попередні специфікації:** `2026-05-30-llm-wiki-knowledge-system-design.md`, `2026-05-30-llm-wiki-phase2a-dialogue-engine-design.md`
 

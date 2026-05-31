@@ -3,7 +3,7 @@
 - **Дата:** 2026-05-30
 - **Статус:** Approved (design)
 - **Автор:** Andrii Paslavskyi + Claude
-- **Репозиторій:** `abc-budget/requirements`
+- **Репозиторій:** `paslavskyi/llm-wiki`
 
 ---
 
@@ -68,7 +68,7 @@ Product requirements (spec-docs & implementation plans), Roadmap/KPI та
 ## 3. Структура репозиторію
 
 ```
-abc-budget/requirements/
+/requirements/
 ├── CLAUDE.md                  # авто-вхід: правила, інваріанти, словник, протокол
 ├── kb.config.yml              # mode (debug/autonomous), language, owner
 ├── STATE.md                   # знімок: фаза, зроблено, далі, відкриті питання

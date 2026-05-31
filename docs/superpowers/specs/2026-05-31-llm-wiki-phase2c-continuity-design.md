@@ -2,7 +2,7 @@
 
 - **Дата:** 2026-05-31
 - **Статус:** Draft (design) — очікує review
-- **Репозиторій:** `abc-budget/requirements`
+- **Репозиторій:** `paslavskyi/llm-wiki`
 - **Спирається на:** Phase 1 + 2a + 2b (merged, 93 tests)
 - **Попередні специфікації:** knowledge-system-design, phase2a, phase2b
 

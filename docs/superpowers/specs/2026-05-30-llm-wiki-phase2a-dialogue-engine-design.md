@@ -3,7 +3,7 @@
 - **Дата:** 2026-05-30
 - **Статус:** Draft (design) — очікує review
 - **Автор:** Andrii Paslavskyi + Claude
-- **Репозиторій:** `abc-budget/requirements`
+- **Репозиторій:** `paslavskyi/llm-wiki`
 - **Спирається на:** Phase 1 (merged) — atomic notes, validate/reindex, hooks, kb-orient/kb-capture/kb-recall
 - **Попередній spec:** `docs/superpowers/specs/2026-05-30-llm-wiki-knowledge-system-design.md`
 
