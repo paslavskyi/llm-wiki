@@ -1,8 +1,10 @@
 import { basename, join } from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { walkMarkdown } from '../lib/walk.mjs';
 import { readNote } from '../lib/note.mjs';
 import { loadValidators } from '../lib/schemas.mjs';
+import { findDuplicateTopLevelKeys } from '../lib/frontmatter-keys.mjs';
 
 export async function validateNotes(rootDir) {
   const errors = [];
@@ -11,6 +13,19 @@ export async function validateNotes(rootDir) {
 
   const notes = [];
   for (const file of files) {
+    // Defense in depth (Bug 2): gray-matter/js-yaml silently keep the LAST of a
+    // duplicated frontmatter key on parse, so scan the RAW block for repeated
+    // top-level keys (parsing would collapse them and hide the corruption).
+    try {
+      const raw = await readFile(file, 'utf8');
+      const dupKeys = findDuplicateTopLevelKeys(raw);
+      if (dupKeys.length > 0) {
+        errors.push(`${basename(file)}: duplicate frontmatter key — ${dupKeys.join(', ')}`);
+      }
+    } catch {
+      // unreadable file is surfaced by readNote below
+    }
+
     let note;
     try {
       note = await readNote(file);

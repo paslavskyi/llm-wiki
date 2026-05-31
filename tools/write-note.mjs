@@ -1,10 +1,11 @@
-import { join, dirname } from 'node:path';
+import { join, dirname, basename, resolve } from 'node:path';
 import { writeFile, readFile, rename, unlink, mkdir, access } from 'node:fs/promises';
 import matter from 'gray-matter';
 import { walkMarkdown } from '../lib/walk.mjs';
 import { readNote } from '../lib/note.mjs';
 import { healNote, slugify } from '../lib/heal.mjs';
 import { loadValidators } from '../lib/schemas.mjs';
+import { assertNoDuplicateFrontmatterKeys } from '../lib/frontmatter-keys.mjs';
 
 function todayISO(ctxToday) {
   // today must be injected (Date.now is unavailable in some contexts); fall back.
@@ -63,10 +64,17 @@ export async function writeNote(rootDir, targetPath, intent, opts = {}) {
   // 1. reconstruct to healthy
   const healed = healNote(intent, { existing, supersededIndex, today });
 
-  // 2. write temp in same dir
+  // 2. serialize + write temp in same dir.
+  //    Defense in depth (Bug 2): never write a file whose frontmatter has a
+  //    duplicate top-level key. The root cause of the one observed corruption
+  //    (ASMP-001 with ~21 alternating title/other lines) is unconfirmed; this
+  //    assert — before the temp write and atomic rename — guarantees a corrupt
+  //    file is never produced or committed.
+  const text = serialize(healed.frontmatter, healed.body);
+  assertNoDuplicateFrontmatterKeys(text);
   const nonce = `${process.pid}-${attemptCounter()}`;
   const tmp = join(dir, `.${healed.frontmatter.id}.${nonce}.tmp`);
-  await writeFile(tmp, serialize(healed.frontmatter, healed.body), 'utf8');
+  await writeFile(tmp, text, 'utf8');
 
   // 3. local validate (parse + schema for this type)
   try {
@@ -85,7 +93,37 @@ export async function writeNote(rootDir, targetPath, intent, opts = {}) {
   // 4. atomic rename (with Windows retry)
   await atomicRename(tmp, targetPath);
 
+  // 5. rename-in-place: a write for an existing id must leave EXACTLY ONE file
+  //    for that id. When the title (and thus the slug filename) changes, the new
+  //    file lands at a new path while the old-slug file for the same id lingers,
+  //    which `validate` then reports as a duplicate id. Sweep knowledge/** for any
+  //    OTHER file belonging to this id and remove it. Uses Node fs (walkMarkdown),
+  //    never shell globbing — filenames are Cyrillic / non-ASCII.
+  await removeStaleIdSiblings(rootDir, healed.frontmatter.id, targetPath);
+
   return { path: targetPath, created: !existed };
+}
+
+// Remove every *.md under knowledge/** whose basename belongs to `id`
+// (`${id}-<slug>.md` or `${id}.md`) except `keepPath`.
+async function removeStaleIdSiblings(rootDir, id, keepPath) {
+  if (!id) return;
+  const keep = resolve(keepPath);
+  const prefix = `${id}-`;
+  const exact = `${id}.md`;
+  let files;
+  try {
+    files = await walkMarkdown(join(rootDir, 'knowledge'));
+  } catch {
+    return;
+  }
+  for (const fp of files) {
+    const name = basename(fp);
+    const sameId = name === exact || name.startsWith(prefix);
+    if (!sameId) continue;
+    if (resolve(fp) === keep) continue;
+    await unlink(fp).catch(() => {});
+  }
 }
 
 let _c = 0;

@@ -119,6 +119,41 @@ test('malformed frontmatter is reported, not thrown', async () => {
   }
 });
 
+test('duplicate top-level frontmatter key is reported (raw scan)', async () => {
+  // Bug 2 (defense in depth): gray-matter/js-yaml keep the LAST of a duplicated
+  // key on parse, so the corruption is invisible to the parsed object. validate
+  // must scan the RAW `---`…`---` block. Two `title:` lines => an error.
+  const dir = await makeTmpDir();
+  try {
+    const dup = `---\nid: FR-001\ntype: requirement\ntitle: First\ntitle: Second\nstatus: draft\nsummary: S\npriority: must\ncategory: functional\n---\nBody.\n`;
+    await writeFileDeep(join(dir, 'knowledge/product/requirements/FR-001-dup.md'), dup);
+    const { errors } = await validateNotes(dir);
+    assert.ok(
+      errors.some(e => /duplicate frontmatter key/i.test(e) && /title/.test(e)),
+      `expected a duplicate-key error mentioning title, got: ${JSON.stringify(errors)}`,
+    );
+  } finally {
+    await cleanup(dir);
+  }
+});
+
+test('repeated keys at deeper indent are NOT flagged as duplicates', async () => {
+  // Only top-level (indent-0) keys must be unique; repeated keys inside nested
+  // mappings/sequences are legitimate YAML.
+  const dir = await makeTmpDir();
+  try {
+    const nested = `---\nid: FR-002\ntype: requirement\ntitle: Nested\nstatus: draft\nsummary: S\npriority: must\ncategory: functional\ntags:\n  - a\n  - b\n---\nBody.\n`;
+    await writeFileDeep(join(dir, 'knowledge/product/requirements/FR-002-nested.md'), nested);
+    const { errors } = await validateNotes(dir);
+    assert.ok(
+      !errors.some(e => /duplicate frontmatter key/i.test(e)),
+      `did not expect a duplicate-key error, got: ${JSON.stringify(errors)}`,
+    );
+  } finally {
+    await cleanup(dir);
+  }
+});
+
 test('filename not matching id is reported', async () => {
   const dir = await makeTmpDir();
   try {
