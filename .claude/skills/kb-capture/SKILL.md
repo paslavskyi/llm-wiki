@@ -56,7 +56,10 @@ Before writing a risk / assumption / trade-off / caveat into a note body, ask:
 ## Step 4 — VERIFY
 - The PostToolUse hook runs `node tools/validate.mjs` automatically. If it reports
   an error, fix the note until validation passes.
-- Update `STATE.md` if the phase, next step, or an open question changed.
+- Update `STATE.md` ONLY for non-derivable intent (current focus / next step). NEVER put note counts,
+  per-domain progress, or open-question lists there — those are generated in `index/MAP.md` +
+  `index/health.md` (an open question is captured as a `Q-` note, which health.md surfaces). Copying
+  derived facts into STATE is what makes it drift. (See CLAUDE.md → "STATE.md scope".)
 
 ## Output (per mode)
 - `debug`: state which note you created/updated, its id, and links added.

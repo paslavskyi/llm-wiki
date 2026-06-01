@@ -6,6 +6,42 @@ import { readNote } from '../lib/note.mjs';
 import { loadValidators } from '../lib/schemas.mjs';
 import { findDuplicateTopLevelKeys } from '../lib/frontmatter-keys.mjs';
 
+// STATE.md is intent-only (see CLAUDE.md → "STATE.md scope"): it must never hold
+// derived facts that already live — fresh — in index/MAP.md + index/health.md. A
+// hand-kept copy of derived state has no invalidation and silently drifts (this
+// is the root cause of STATE.md going stale). This gate forbids the drift-prone
+// content from re-entering STATE.md, turning the design rule into an enforced
+// invariant. It does NOT (cannot) check whether the intent itself is fresh.
+const STATE_FORBIDDEN = [
+  [/progress by domain/i, 'a "Progress by domain" section'],
+  [/\btotal\s+notes?\b/i, 'a "total notes" count'],
+  [/\b\d+\s+(?:notes?|нот\w*)\b/i, 'a note count (e.g. "133 notes")'],
+  [/\bTOP-\d+\b/, 'a specific topic-node id (reference the area by name instead)'],
+  [/\b(?:Q|RISK|ASMP)-\d+\b/, 'a specific open-item id (Q-/RISK-/ASMP-)'],
+];
+
+// checkStateScope: lint STATE.md for derived content that belongs to the indexes.
+export async function checkStateScope(rootDir) {
+  let text;
+  try {
+    text = await readFile(join(rootDir, 'STATE.md'), 'utf8');
+  } catch {
+    return []; // no STATE.md → nothing to check
+  }
+  const errors = [];
+  for (const [re, what] of STATE_FORBIDDEN) {
+    const m = text.match(re);
+    if (m) {
+      errors.push(
+        `STATE.md: must not contain ${what} — found ${JSON.stringify(m[0].trim().slice(0, 50))}. ` +
+        `That is derived state (it lives in index/MAP.md + index/health.md); ` +
+        `STATE.md holds intent only (CLAUDE.md → "STATE.md scope").`,
+      );
+    }
+  }
+  return errors;
+}
+
 export async function validateNotes(rootDir) {
   const errors = [];
   const { validatorFor } = await loadValidators();
@@ -99,6 +135,9 @@ export async function validateNotes(rootDir) {
       }
     }
   }
+
+  // 5. STATE.md scope gate — prevent derived-state drift re-entering STATE.md.
+  errors.push(...(await checkStateScope(rootDir)));
 
   return { errors };
 }

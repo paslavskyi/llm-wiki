@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
-import { validateNotes } from '../tools/validate.mjs';
+import { validateNotes, checkStateScope } from '../tools/validate.mjs';
 import { makeTmpDir, writeFileDeep, cleanup } from './helpers.mjs';
 
 const GOOD = `---
@@ -160,6 +160,84 @@ test('filename not matching id is reported', async () => {
     await writeFileDeep(join(dir, 'knowledge/users/JTBD-999-track.md'), JTBD);
     const { errors } = await validateNotes(dir);
     assert.ok(errors.some(e => /filename/i.test(e) && /JTBD-001/.test(e)));
+  } finally {
+    await cleanup(dir);
+  }
+});
+
+// --- STATE.md scope gate (prevents derived-state drift) ---
+
+const STATE_INTENT_ONLY = `# STATE — current focus (intent only)
+
+## Now
+Capturing ABC Budget knowledge.
+
+## Next step
+Send Prompt 1.1, then Prompts 2 → 6 (Phases 1–2c done). Open questions are \`Q-*\` notes
+(see index/health.md). Deliverable: 2026-06-01-abc-budget-core-ui-design-brief.md.
+`;
+
+test('STATE.md scope: intent-only file passes (no false positives)', async () => {
+  const dir = await makeTmpDir();
+  try {
+    await writeFileDeep(join(dir, 'STATE.md'), STATE_INTENT_ONLY);
+    assert.deepEqual(await checkStateScope(dir), []);
+  } finally {
+    await cleanup(dir);
+  }
+});
+
+test('STATE.md scope: no STATE.md → no error', async () => {
+  const dir = await makeTmpDir();
+  try {
+    assert.deepEqual(await checkStateScope(dir), []);
+  } finally {
+    await cleanup(dir);
+  }
+});
+
+test('STATE.md scope: a note count is rejected', async () => {
+  const dir = await makeTmpDir();
+  try {
+    await writeFileDeep(join(dir, 'STATE.md'), '# STATE\n\nTotal notes: 133. Drilling 133 notes.\n');
+    const errors = await checkStateScope(dir);
+    assert.ok(errors.some(e => /STATE\.md/.test(e) && /count/i.test(e)),
+      `expected a count error, got: ${JSON.stringify(errors)}`);
+  } finally {
+    await cleanup(dir);
+  }
+});
+
+test('STATE.md scope: progress-by-domain + topic ids are rejected', async () => {
+  const dir = await makeTmpDir();
+  try {
+    await writeFileDeep(join(dir, 'STATE.md'), '# STATE\n\n## Progress by domain\n- TOP-002 product — empty\n');
+    const errors = await checkStateScope(dir);
+    assert.ok(errors.some(e => /Progress by domain/i.test(e)), `got: ${JSON.stringify(errors)}`);
+    assert.ok(errors.some(e => /TOP-/.test(e)), `got: ${JSON.stringify(errors)}`);
+  } finally {
+    await cleanup(dir);
+  }
+});
+
+test('STATE.md scope: open-item ids are rejected', async () => {
+  const dir = await makeTmpDir();
+  try {
+    await writeFileDeep(join(dir, 'STATE.md'), '# STATE\n\nOpen: Q-014, RISK-008.\n');
+    const errors = await checkStateScope(dir);
+    assert.ok(errors.some(e => /open-item/i.test(e)), `got: ${JSON.stringify(errors)}`);
+  } finally {
+    await cleanup(dir);
+  }
+});
+
+test('STATE.md scope: gate is wired into validateNotes', async () => {
+  const dir = await makeTmpDir();
+  try {
+    await writeFileDeep(join(dir, 'knowledge/users/JTBD-001-track.md'), JTBD);
+    await writeFileDeep(join(dir, 'STATE.md'), '# STATE\n\nTotal notes: 42.\n');
+    const { errors } = await validateNotes(dir);
+    assert.ok(errors.some(e => /STATE\.md/.test(e)), `expected STATE.md error from validateNotes, got: ${JSON.stringify(errors)}`);
   } finally {
     await cleanup(dir);
   }

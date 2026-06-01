@@ -12,8 +12,9 @@ questions — without loading the whole knowledge base.
 1. Read `kb.config.yml`. Note `mode` and `language`. Respond in `language`.
    - `debug`: report what you read and the full picture.
    - `autonomous`: give only a short human summary of where things stand.
-2. Read `STATE.md` — current phase, progress checklist, next step, open items.
-3. Read `index/MAP.md` — domains and note counts. Do NOT open individual notes yet.
+2. Read `STATE.md` — current focus + next step (intent ONLY; it does not hold counts/progress).
+3. Read `index/MAP.md` — domains and note counts. Do NOT open individual notes yet. This is the
+   AUTHORITATIVE source for counts/progress; if `STATE.md` ever disagrees, MAP/health win.
 4. If `index/health.md` exists (Phase 2+), read it for open questions/risks.
 5. Produce an orientation summary:
    - Current phase and the single recommended next step.

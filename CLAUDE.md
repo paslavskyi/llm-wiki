@@ -8,7 +8,8 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 1. **Knowledge** (`knowledge/`) — atomic Markdown notes with YAML frontmatter.
    The single source of truth. Written by humans / in dialogue.
 2. **Indexes** (`index/`) — GENERATED routing layer. Never edit by hand.
-3. **State** (`STATE.md`, `journal/`) — where we are + history between sessions.
+3. **State** (`STATE.md`) — current non-derivable *intent* only (focus + next step). NOT counts or
+   progress (those are generated in `index/`). There is no `journal/`; history lives in git (`kb-recap`).
 
 ## Session protocol (do this every session)
 1. Read `kb.config.yml` — sets `mode` (debug/autonomous) and `language`.
@@ -19,6 +20,10 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 
 ## Invariants (do not violate)
 - Never edit files in `index/` or `docs/` by hand — they are generated.
+- **STATE.md scope**: `STATE.md` holds ONLY non-derivable intent (current focus + next step). Never
+  copy derived facts into it — note counts, per-domain progress, and open `Q-`/`RISK-`/`ASMP-` lists
+  belong to the generated `index/MAP.md` + `index/health.md`. Reference them; don't duplicate (a copy
+  has no invalidation and silently drifts). If STATE and an index disagree, the index wins.
 - Never read the whole knowledge base — navigate index-first (MAP → domain index → note).
 - Every note has a stable `id`; once assigned, an id is never reused or deleted.
 - A note's filename must start with its `id` (e.g., `FR-001-budget.md`).

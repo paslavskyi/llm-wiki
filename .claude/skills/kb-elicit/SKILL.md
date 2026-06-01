@@ -19,7 +19,8 @@ saving each note only once it is a logically consistent, complete thought.
 4. For each agreed top-level area, create a `topic` note (`parent: null`) via
    `kb-capture`, placed in `knowledge/<key>/`. Use the area's `framing` questions
    to seed the conversation.
-5. Update `STATE.md`: map framed; recommended next area.
+5. Update `STATE.md`: map framed; recommended next area. (Intent only — never copy counts/progress;
+   those are generated in `index/`. See CLAUDE.md → "STATE.md scope".)
 
 ### Stage 1 — drill top-down (when a map exists)
 1. Present the agenda (see "Coverage / agenda" below) and propose where to dive.
@@ -35,7 +36,7 @@ saving each note only once it is a logically consistent, complete thought.
    assumption -> `ASMP-`, risk -> `RISK-`, attached to the same node.
 5. On request, propose options or research (web/evidence) and fold conclusions
    back into notes (cite sources for research).
-6. Update `STATE.md` (current node, next step).
+6. Update `STATE.md` (current focus, next step — intent only; no counts/progress, see "STATE.md scope").
 
 ## Saving rule
 Save when a note is logically consistent. Ask a clarifying question instead of
