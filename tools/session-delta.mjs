@@ -1,6 +1,30 @@
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
+// git quotes paths with non-ASCII/special chars when core.quotePath is on
+// (the default): wraps in "..." with C-style octal escapes (\321\201 …).
+// We run git with -c core.quotePath=false (raw UTF-8), but this stays as a
+// belt-and-suspenders unquote so the parser is correct regardless of caller.
+function unquoteGitPath(field) {
+  const s = field.trim();
+  if (s.length < 2 || s[0] !== '"' || s[s.length - 1] !== '"') return s;
+  const inner = s.slice(1, -1);
+  // decode \ooo octal byte escapes (UTF-8) and common \-escapes
+  const bytes = [];
+  for (let i = 0; i < inner.length; i++) {
+    if (inner[i] === '\\' && i + 3 < inner.length + 1 && /[0-7]/.test(inner[i + 1] ?? '')) {
+      const oct = inner.slice(i + 1, i + 4);
+      if (/^[0-7]{3}$/.test(oct)) { bytes.push(parseInt(oct, 8)); i += 3; continue; }
+    }
+    if (inner[i] === '\\' && (inner[i + 1] === '"' || inner[i + 1] === '\\')) {
+      bytes.push(inner.charCodeAt(i + 1)); i += 1; continue;
+    }
+    bytes.push(inner.charCodeAt(i));
+  }
+  try { return new TextDecoder('utf-8').decode(Uint8Array.from(bytes)); }
+  catch { return inner; }
+}
+
 // classifyDelta: parse `git diff --name-status` lines → knowledge/ buckets.
 // Optional area = a knowledge subfolder name (e.g. "users").
 export function classifyDelta(nameStatus, { area } = {}) {
@@ -13,7 +37,9 @@ export function classifyDelta(nameStatus, { area } = {}) {
     // rename/copy: name-status uses Rxx\told\tnew (or Cxx\told\tnew); take the last field
     const parts = line.split('\t');
     if (parts.length < 2) continue; // non-name-status line (e.g. log subject) — skip, keep parsing
-    const norm = parts[parts.length - 1].replaceAll('\\', '/');
+    // Defense in depth: even if git quoted the path (core.quotePath), strip the
+    // wrapping quotes so non-ASCII (e.g. Cyrillic) note names are still matched.
+    const norm = unquoteGitPath(parts[parts.length - 1]).replaceAll('\\', '/');
     if (!norm.startsWith(prefix) || !norm.endsWith('.md')) continue;
     if (code === 'A' || code === 'R' || code === 'C') added.push(norm);
     else if (code === 'M') updated.push(norm);
@@ -40,10 +66,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // For --since we need log form; for ref range a diff form. Use diff for ref, log for since.
   let nameStatus = '';
   try {
+    // -c core.quotePath=false → git prints raw UTF-8 paths (no "..."/octal),
+    // so non-ASCII (Cyrillic) note names are matched correctly.
     if (since) {
-      nameStatus = execSync(`git log --since=${JSON.stringify(since)} --name-status --pretty=format: -- knowledge/`, { cwd: root, encoding: 'utf8' });
+      nameStatus = execSync(`git -c core.quotePath=false log --since=${JSON.stringify(since)} --name-status --pretty=format: -- knowledge/`, { cwd: root, encoding: 'utf8' });
     } else {
-      nameStatus = execSync(`git diff --name-status ${range} -- knowledge/`, { cwd: root, encoding: 'utf8' });
+      nameStatus = execSync(`git -c core.quotePath=false diff --name-status ${range} -- knowledge/`, { cwd: root, encoding: 'utf8' });
     }
   } catch { nameStatus = ''; }
 
