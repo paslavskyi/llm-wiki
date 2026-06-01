@@ -42,6 +42,10 @@ Save when a note is logically consistent. Ask a clarifying question instead of
 saving a half-formed note. Confirm with the user only when a write OVERWRITES
 existing knowledge; new, consistent knowledge is captured as it forms.
 
+Recurring concern? If the same risk/assumption/trade-off recurs across ≥2 notes,
+canonicalize it into ONE note and link the others to it — don't re-state the same
+thought in multiple bodies (see kb-capture "Recurring-concern check").
+
 ## Coverage / agenda (what to work on next)
 Compose, do not maintain a separate drifting artifact:
 1. Empty areas — from `index/MAP.md` (count 0).

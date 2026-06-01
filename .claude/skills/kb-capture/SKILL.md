@@ -16,6 +16,24 @@ If the update would ripple to other notes (their meaning depends on this change)
 stop and hand off to `kb-evolve` (Phase 2). For Phase 1, note the ripple in your
 response and update only this note.
 
+### Recurring-concern check (avoid duplicating a thought across note bodies)
+`resolve` above catches duplicate NOTES. This catches a duplicate THOUGHT — the
+same risk / assumption / trade-off / caveat re-stated inside the bodies of several
+otherwise-different notes (the dup-detection heuristic can't see this, because the
+titles differ).
+
+Before writing a risk / assumption / trade-off / caveat into a note body, ask:
+"Have I already stated this same concern elsewhere?"
+- If it recurs in **≥2 notes**, it is **cross-cutting**: create ONE canonical note
+  for it (`RISK-`/`ASMP-`/`Q-`; `status: accepted` if it's a decided/accepted risk),
+  and have the other notes **link** to it instead of restating it. Each note's body
+  then describes only what is *specific to it*; the shared concern lives in the canon.
+- Threshold matters (avoid over-splitting): only canonicalize a concern that genuinely
+  repeats as its own unit — not every passing mention of a word. One real second
+  occurrence is the trigger.
+- If the duplication already exists across notes, canonicalize + relink (use
+  `kb-evolve` to replace inline restatements with a link).
+
 ## Step 2 — IDENTIFY
 - Pick the `type` from the vocabulary in `CLAUDE.md`.
 - Choose the matching domain folder and ID prefix.
