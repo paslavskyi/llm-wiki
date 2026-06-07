@@ -86,6 +86,10 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 - `.claude/skills/` — kb-orient, kb-capture, kb-recall, kb-elicit, kb-visualize, kb-evolve, kb-sanitize
 
 ## Tooling
+- `npm run kb:write` — batch-write notes through the heal/validate pipeline.
+  JSON on stdin: `[{domainDir, frontmatter, body}]` (body = string or string[] of
+  lines). For coherent multi-note writes/updates; a single note still goes via
+  `kb-capture`. Avoids ad-hoc temp scripts and JS-string escaping pitfalls.
 - `npm run validate` — validate all notes (also runs automatically after writes).
 - `npm run reindex` — regenerate `index/` (also runs automatically at end of turn).
 - `npm test` — run the tool test suite.

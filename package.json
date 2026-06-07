@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node --test",
     "validate": "node tools/validate.mjs",
+    "kb:write": "node tools/kb-write.mjs",
     "reindex": "node tools/reindex.mjs",
     "mindmap": "node tools/mindmap-html.mjs",
     "graph": "node tools/graph.mjs",
