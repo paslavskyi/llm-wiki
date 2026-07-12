@@ -11,6 +11,12 @@ stable-id invariant.
 ## Before any change with ripple
 Run `node tools/impact.mjs <ID>` (optionally `--depth N`) and show the blast
 radius (who links to this note, what it links to). Decide WITH the user.
+Note: edges include ALL reference fields — `links`, body `[[..]]`, goal `scope`,
+plan `active`/`queue`/`backlog`, timeline `sequence` — so membership in a goal,
+the operational plan, or the product timeline shows up in the radius. When
+deprecating a note that a plan/timeline references, validate will demand the
+reference be re-pointed (plan/timeline must hold live ids; use `npm run plan`
+for plan lists).
 
 ## Operations
 

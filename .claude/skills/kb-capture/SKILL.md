@@ -46,7 +46,10 @@ Before writing a risk / assumption / trade-off / caveat into a note body, ask:
   write pipeline derives it).
 - Build the note "intent" (frontmatter required fields: `id, type, title, status,
   summary` + `priority, category` for requirement/nfr; `parent` for topic; plus
-  `links`, body). Set `status: draft` for new notes.
+  `links`, body). Status of a NEW note reflects how settled the knowledge is:
+  `draft` = tentative/unconfirmed; `proposed` = awaiting the owner's verdict;
+  `accepted` = the owner confirmed/decided it in this dialogue (approved
+  decisions, goals, reached stages). Don't default to `draft` for owner-approved facts.
 - Write via the atomic write pipeline `tools/write-note.mjs` (NOT a raw Write):
   it reconstructs the note to a healthy state (rule_set: sets `updated`, preserves
   `created`, resolves any deprecated refs to live ids, dedupes links, removes

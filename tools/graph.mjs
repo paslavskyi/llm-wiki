@@ -1,22 +1,13 @@
 import { join } from 'node:path';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { walkMarkdown } from '../lib/walk.mjs';
-import { readNote } from '../lib/note.mjs';
+import { loadNotes } from '../lib/load-notes.mjs';
 import { buildTree } from '../lib/mindmap.mjs';
 import { jaroWinkler, normalizeForCompare } from '../lib/jaro-winkler.mjs';
 import { loadConfig } from '../lib/config.mjs';
+import { OPEN_TYPES, isOpenNote } from '../lib/open.mjs';
 
 const BANNER = '<!-- GENERATED — do not edit by hand. Run: node tools/graph.mjs -->';
-
-async function loadNotes(rootDir) {
-  const files = await walkMarkdown(join(rootDir, 'knowledge'));
-  const notes = [];
-  for (const fp of files) {
-    try { notes.push(await readNote(fp)); } catch { /* validate reports parse errors */ }
-  }
-  return notes;
-}
 
 export async function buildHealth(rootDir, opts = {}) {
   const notes = await loadNotes(rootDir);
@@ -42,10 +33,10 @@ export async function buildHealth(rootDir, opts = {}) {
   }
   debt.sort((a, b) => a.deprecated.localeCompare(b.deprecated));
 
-  // Tier 1.2 open Q/RISK/ASMP
-  const openTypes = new Set(['question', 'risk', 'assumption']);
+  // Tier 1.2 open Q/RISK/ASMP (shared definition — lib/open.mjs)
+  const openTypes = OPEN_TYPES;
   const open = notes
-    .filter(n => openTypes.has(n.frontmatter.type) && n.frontmatter.status !== 'accepted')
+    .filter(n => isOpenNote(n.frontmatter))
     .map(n => n.frontmatter.id).filter(Boolean).sort();
 
   // Tier 1.3 empty topic nodes (topic with no attached concrete notes and no children)

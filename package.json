@@ -9,6 +9,8 @@
     "kb:write": "node tools/kb-write.mjs",
     "reindex": "node tools/reindex.mjs",
     "mindmap": "node tools/mindmap-html.mjs",
+    "dashboard": "node tools/dashboard/server.mjs",
+    "plan": "node tools/plan.mjs",
     "graph": "node tools/graph.mjs",
     "impact": "node tools/impact.mjs",
     "install-hooks": "node tools/install-hooks.mjs"
@@ -17,5 +19,9 @@
     "ajv": "^8.17.1",
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "echarts": "^6.1.0",
+    "marked": "^18.0.6"
   }
 }

@@ -1,7 +1,5 @@
-import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { walkMarkdown } from '../lib/walk.mjs';
-import { readNote } from '../lib/note.mjs';
+import { loadNotes } from '../lib/load-notes.mjs';
 
 // outgoing edges: id -> [linked ids]; incoming edges: id -> [linker ids]
 function buildEdges(notes) {
@@ -53,10 +51,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const di = args.indexOf('--depth');
   const depth = di >= 0 ? Number(args[di + 1]) : 1;
   if (!id) { console.error('usage: impact <ID> [--depth N]'); process.exit(1); }
-  const root = process.cwd();
-  const files = await walkMarkdown(join(root, 'knowledge'));
-  const notes = [];
-  for (const fp of files) { try { notes.push(await readNote(fp)); } catch {} }
+  const notes = await loadNotes(process.cwd());
   const { incoming, outgoing } = computeImpact(id, notes, depth);
   console.log(`impact of ${id} (depth ${depth}):`);
   console.log(`  incoming (${incoming.length}): ${incoming.sort().join(', ') || '—'}`);

@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node tools/reindex.mjs"
+            "command": "node tools/reindex.mjs && node tools/graph.mjs"
           }
         ]
       }

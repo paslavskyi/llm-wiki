@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Altus — продуктовий дашборд</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<div id="app" class="loading" aria-busy="true">
+  <header class="promptline">
+    <span class="prompt-chunk repo">altus-knowledge</span>
+    <span class="prompt-sep">@</span>
+    <span class="prompt-chunk mono" id="git-branch">…</span>
+    <span class="prompt-sep">·</span>
+    <span class="prompt-chunk mono" id="git-commit">…</span>
+    <span class="prompt-sep">·</span>
+    <span class="prompt-chunk" id="notes-total">…</span>
+    <span class="prompt-flex"></span>
+    <span class="prompt-chunk dim" id="freshness">…</span>
+    <button id="refresh" title="Оновити дані (F5 теж працює)">⟳ оновити</button>
+  </header>
+
+  <nav class="tabbar" role="tablist">
+    <button data-tab="product" class="on" role="tab">Продукт</button>
+    <button data-tab="delivery" role="tab">Розробка</button>
+    <button data-tab="map" role="tab">Мапа</button>
+    <button data-tab="kb" role="tab">KB</button>
+  </nav>
+
+  <!-- ══ ПРОДУКТ ══ -->
+  <main data-panel="product">
+    <section class="hero" aria-labelledby="hero-title">
+      <p class="eyebrow">Де ми зараз</p>
+      <div id="hero-focus" class="hero-focus">Завантаження…</div>
+      <details class="hero-phase">
+        <summary>Фаза проєкту</summary>
+        <div id="hero-phase"></div>
+      </details>
+    </section>
+
+    <section class="card" aria-labelledby="tl-title">
+      <div class="card-head">
+        <h2 id="tl-title">Timeline продукту</h2>
+        <span class="dim card-note">стадії одна за одною · ●=досягнуто · маркер = де ми зараз · клік — повна нотатка</span>
+      </div>
+      <div class="tl" id="timeline"></div>
+    </section>
+
+    <section class="card" aria-labelledby="goals-title">
+      <div class="card-head">
+        <h2 id="goals-title">Goals</h2>
+        <span class="dim card-note">прогрес = частка scope зі status accepted; черга/backlog — з операційного плану</span>
+      </div>
+      <div class="goals-grid" id="goals-grid"></div>
+    </section>
+
+    <div class="grid-2">
+      <section class="card" aria-labelledby="vision-title">
+        <div class="card-head"><h2 id="vision-title">Концепція продукту</h2></div>
+        <div id="vision-lead"></div>
+        <div class="chips" id="vision-chips"></div>
+      </section>
+
+      <section class="card" aria-labelledby="kpi-title">
+        <div class="card-head"><h2 id="kpi-title">KPI</h2></div>
+        <div id="kpi-box"></div>
+      </section>
+    </div>
+
+    <section class="card" aria-labelledby="mil-title">
+      <div class="card-head">
+        <h2 id="mil-title">Milestones (віхи)</h2>
+        <div class="seg" role="tablist" id="mil-filter">
+          <button data-f="active" class="on">Реалізовані</button>
+          <button data-f="proposed">Заплановані</button>
+          <button data-f="all">Всі</button>
+        </div>
+      </div>
+      <ul class="notelist" id="mil-list"></ul>
+    </section>
+  </main>
+
+  <!-- ══ РОЗРОБКА ══ -->
+  <main data-panel="delivery" hidden>
+    <section class="card lane-wip" aria-labelledby="wip-title">
+      <div class="card-head"><h2 id="wip-title">В розробці</h2></div>
+      <div id="wip-list"></div>
+    </section>
+
+    <section class="card" aria-labelledby="todo-title">
+      <div class="card-head">
+        <h2 id="todo-title">TODO — черга</h2>
+        <span class="dim card-note">зверху вниз: послідовність, у якій беремо задачі · керується діалогом (kb-plan)</span>
+      </div>
+      <ul class="notelist" id="todo-list"></ul>
+    </section>
+
+    <div class="grid-2">
+      <section class="card" aria-labelledby="done-title">
+        <div class="card-head"><h2 id="done-title">Done</h2><span class="dim card-note">з git-історії плану</span></div>
+        <ul class="notelist" id="done-list"></ul>
+      </section>
+      <section class="card" aria-labelledby="parked-title">
+        <div class="card-head"><h2 id="parked-title">Backlog</h2></div>
+        <ul class="notelist" id="parked-list"></ul>
+      </section>
+    </div>
+
+    <section class="card" aria-labelledby="debt-title">
+      <div class="card-head"><h2 id="debt-title">Технічний борг</h2><span class="dim card-note">відкриті ризики з борговими тегами</span></div>
+      <div class="chips" id="debt-tags"></div>
+      <ul class="notelist" id="debt-list"></ul>
+    </section>
+
+    <section class="card" aria-labelledby="livetail-title">
+      <div class="card-head"><h2 id="livetail-title">Живий хвіст (STATE)</h2></div>
+      <div id="livetail" class="mdbody"></div>
+    </section>
+  </main>
+
+  <!-- ══ МАПА ══ -->
+  <main data-panel="map" hidden>
+    <section class="card card-map" aria-labelledby="map-title">
+      <div class="card-head">
+        <h2 id="map-title">Мапа знань</h2>
+        <span class="dim card-note">клік на тему — розгорнути/згорнути · клік на нотатку — повний зміст · колесо — зум · drag — панорама</span>
+      </div>
+      <div class="map-scroll">
+        <div class="chart-map" id="chart-mindmap" role="img" aria-label="Інтерактивне дерево тем і нотаток бази знань"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ══ KB ══ -->
+  <main data-panel="kb" hidden>
+    <section class="tiles" aria-label="Показники KB">
+      <div class="tile"><span class="tile-value" id="t-live">–</span><span class="tile-label">живих нотаток</span></div>
+      <div class="tile"><span class="tile-value" id="t-goals">–</span><span class="tile-label">цілей</span></div>
+      <div class="tile"><span class="tile-value" id="t-deprecated">–</span><span class="tile-label">deprecated</span></div>
+      <div class="tile tile-risk"><span class="tile-value" id="t-risks">–</span><span class="tile-label">відкритих ризиків</span></div>
+      <div class="tile tile-q"><span class="tile-value" id="t-questions">–</span><span class="tile-label">відкритих питань</span></div>
+    </section>
+
+    <div class="grid-2">
+      <section class="card" aria-labelledby="health-title">
+        <div class="card-head"><h2 id="health-title">Здоровʼя: ризики та питання</h2></div>
+        <ul class="notelist" id="health-list"></ul>
+      </section>
+      <section class="card" aria-labelledby="domains-title">
+        <div class="card-head"><h2 id="domains-title">Нотатки за доменами</h2></div>
+        <div class="chart" id="chart-domains" role="img" aria-label="Стовпчикова діаграма: кількість нотаток у кожному домені"></div>
+      </section>
+    </div>
+
+    <section class="card" aria-labelledby="pulse-title">
+      <div class="card-head">
+        <h2 id="pulse-title">Пульс KB</h2>
+        <span class="dim card-note">створені та оновлені нотатки за місяцями</span>
+      </div>
+      <div class="chart chart-wide" id="chart-pulse" role="img" aria-label="Лінійна діаграма: створені та оновлені нотатки за місяцями"></div>
+    </section>
+
+    <section class="card" aria-labelledby="recent-title">
+      <div class="card-head"><h2 id="recent-title">Нещодавно оновлені</h2></div>
+      <ul class="notelist" id="recent-list"></ul>
+    </section>
+  </main>
+
+  <footer class="dim">
+    read-only viewer · джерело істини — <span class="mono">knowledge/</span> · план — діалогом (kb-plan) · DEC-031/032
+  </footer>
+</div>
+
+<!-- Drawer: повна нотатка -->
+<div id="drawer-backdrop" hidden></div>
+<aside id="drawer" hidden aria-label="Повна нотатка">
+  <div class="drawer-head">
+    <span class="nid" id="dr-id"></span>
+    <span class="badge" id="dr-status"></span>
+    <span class="prompt-flex"></span>
+    <button id="dr-close" title="Закрити (Esc)">✕</button>
+  </div>
+  <h2 id="dr-title"></h2>
+  <div class="dr-meta mono dim" id="dr-meta"></div>
+  <div class="chips" id="dr-tags"></div>
+  <div class="dr-summary" id="dr-summary"></div>
+  <div class="mdbody" id="dr-body"></div>
+  <div id="dr-scope-box"><h3>Склад (scope)</h3><ul class="notelist" id="dr-scope"></ul></div>
+  <div id="dr-links-box"><h3>Повʼязані</h3><div class="chips" id="dr-links"></div></div>
+  <div id="dr-back-box"><h3>Сюди посилаються</h3><div class="chips" id="dr-backlinks"></div></div>
+</aside>
+
+<script src="/vendor/echarts.min.js"></script>
+<script src="/vendor/marked.umd.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

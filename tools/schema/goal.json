@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "goal",
+  "type": "object",
+  "required": ["id", "type", "title", "status", "summary", "scope"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^GOAL-[0-9]+$" },
+    "type": { "const": "goal" },
+    "title": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["draft", "proposed", "accepted", "deprecated"] },
+    "summary": { "type": "string", "minLength": 1 },
+    "scope": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Z]+-[A-Za-z0-9-]+$" }
+    },
+    "stage": false,
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "links": { "type": "array", "items": { "type": "string" } },
+    "topic": { "type": "string", "pattern": "^TOP-[0-9]+$" },
+    "created": { "type": "string" },
+    "updated": { "type": "string" },
+    "superseded_by": { "type": ["string", "null"] }
+  }
+}

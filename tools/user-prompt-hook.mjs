@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process';
-import { writeFile, rm } from 'node:fs/promises';
+import { writeFile, rm, access } from 'node:fs/promises';
 import { join } from 'node:path';
 import { parseKnowledgeChanges } from '../lib/git-status.mjs';
 import { nextMarkerState, shouldRemind, readMarker } from '../lib/dirty-marker.mjs';
@@ -8,6 +8,17 @@ import { autoCommit } from './auto-commit.mjs';
 import { loadConfig } from '../lib/config.mjs';
 
 const root = process.cwd();
+
+// The validate gate only works if the git hook is actually installed — git
+// hooks don't survive cloning, so nudge here (mechanism, not instruction).
+try {
+  await access(join(root, 'tools', 'hooks', 'pre-commit'));
+  try {
+    await access(join(root, '.git', 'hooks', 'pre-commit'));
+  } catch {
+    console.log('[kb] git pre-commit guard is NOT installed — run `npm run install-hooks` (validate gate is inactive until then).');
+  }
+} catch { /* no hook source in this repo */ }
 
 const config = (await loadConfig(root)).persistence;
 if (config.autocommit === 'off') process.exit(0);

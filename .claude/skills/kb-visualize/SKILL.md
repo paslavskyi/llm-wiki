@@ -1,27 +1,27 @@
 ---
 name: kb-visualize
-description: Use to generate or refresh the graphical, interactive mind-map of the knowledge base and tell the user how to open it in a browser. Renders the topic graph as a self-contained offline HTML file.
+description: Use to show the graphical, interactive mind-map of the knowledge base. Primary view: the live dashboard's «Мапа» tab (kb-dashboard). Fallback: regenerate the offline self-contained index/mindmap.html.
 ---
 
 # kb-visualize — graphical mind-map
 
-Goal: produce an interactive, zoomable mind-map the human can open in a browser.
+Goal: let the human see and navigate the topic graph in a browser.
 
-## Steps
+## Primary: live map in the dashboard (DEC-031/032)
+1. Ensure the dashboard server runs (`kb-dashboard` skill / `npm run dashboard`).
+2. Point the user to **http://localhost:4321 → вкладка «Мапа»**.
+   - Always current (computed from knowledge/ per request; ⟳/F5 refreshes).
+   - Click a node → the full note opens in the drawer (scope, links, backlinks).
+   - Double-click collapses/expands a branch; mouse wheel zooms; drag pans.
+
+## Fallback: offline artifact (no server needed)
 1. Run `node tools/mindmap-html.mjs` (or `npm run mindmap`) to regenerate
    `index/mindmap.html` from the current topic graph.
-2. Tell the user the path and how to open it:
-   - Windows: `start index/mindmap.html`
-   - macOS: `open index/mindmap.html`
-   - or open the `file://` path in any browser.
-3. Optionally summarize what's shown (number of areas / sub-topics / notes), read
-   from `index/mindmap.md` — do not open the whole knowledge tree.
-
-## Output (per mode)
-- `debug`: confirm the file was regenerated and give the open command.
-- `autonomous`: short acknowledgement + how to open it.
+2. Open it: Windows `start index/mindmap.html` (fully offline, vendored d3 +
+   markmap; view-only — no click-through to notes).
 
 ## Notes
-- `index/mindmap.html` is GENERATED — never edit by hand.
-- The file is fully offline (vendored d3 + markmap-view under `tools/vendor/`).
+- `index/mindmap.html` is GENERATED — never edit by hand (and it is gitignored).
+- Optionally summarize what's shown (areas / sub-topics / notes) from
+  `index/mindmap.md` — do not open the whole knowledge tree.
 - This skill is independent of `kb-elicit`; run it anytime.

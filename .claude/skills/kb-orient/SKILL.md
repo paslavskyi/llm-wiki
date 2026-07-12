@@ -16,12 +16,17 @@ questions — without loading the whole knowledge base.
 3. Read `index/MAP.md` — domains and note counts. Do NOT open individual notes yet. This is the
    AUTHORITATIVE source for counts/progress; if `STATE.md` ever disagrees, MAP/health win.
 4. If `index/health.md` exists (Phase 2+), read it for open questions/risks.
-5. Produce an orientation summary:
+5. Run `npm run plan -- show` — the operational plan (в розробці / черга /
+   backlog + recent done). This is the delivery half of "where we are"; STATE
+   holds only strategic intent. Goals/timeline: `index/roadmap.index.md` if needed.
+6. Produce an orientation summary:
    - Current phase and the single recommended next step.
+   - Plan snapshot: what's in work, what's next in the queue.
    - Per-domain note counts (from MAP).
    - Any open questions/risks you saw.
-6. Hand off: if the next step is knowledge capture, suggest running
-   `elicit-requirements` (Phase 2) or proceed with `kb-capture` for a specific insight.
+   - Offer the live dashboard for visuals (`kb-dashboard` → http://localhost:4321).
+7. Hand off: if the next step is knowledge capture, suggest running
+   `kb-elicit` or proceed with `kb-capture` for a specific insight.
 
 ## Rules
 - Never read the whole `knowledge/` tree here. Orientation is index-only.

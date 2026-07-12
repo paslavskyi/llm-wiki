@@ -1,5 +1,9 @@
 {
   "requirement": "requirement.json",
   "nfr": "requirement.json",
-  "topic": "topic.json"
+  "topic": "topic.json",
+  "goal": "goal.json",
+  "plan": "plan.json",
+  "milestone": "milestone.json",
+  "timeline": "timeline.json"
 }

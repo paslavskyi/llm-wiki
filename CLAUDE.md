@@ -19,7 +19,7 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 4. Retrieve knowledge through the **`kb-recall`** skill (index-first).
 
 ## Invariants (do not violate)
-- Never edit files in `index/` or `docs/` by hand — they are generated.
+- Never edit files in `index/` by hand — they are generated.
 - **STATE.md scope**: `STATE.md` holds ONLY non-derivable intent (current focus + next step). Never
   copy derived facts into it — note counts, per-domain progress, and open `Q-`/`RISK-`/`ASMP-` lists
   belong to the generated `index/MAP.md` + `index/health.md`. Reference them; don't duplicate (a copy
@@ -43,11 +43,36 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 | users | persona, segment, jtbd, pain | PER-, SEG-, JTBD-, PAIN- |
 | product | feature, requirement, nfr, story, entity, term | FEAT-, FR-, NFR-, STORY-, ENT-, TERM- |
 | mindmap | topic | TOP- |
-| roadmap | milestone, kpi | MIL-, KPI- |
+| roadmap | milestone, kpi, goal, plan, timeline | MIL-, KPI-, GOAL-, PLAN-, TL- |
 | gtm | positioning, channel, pricing, message | POS-, CHAN-, PRICE-, MSG- |
 | cross-cutting | risk, assumption, question | RISK-, ASMP-, Q- |
+| decisions | decision | DEC- |
 
 `requirement` priority values: `must | should | could | wont`.
+
+The `decisions` domain is the product/architecture decision log (ADR-style): one
+note per significant decision, each recording context, the decision, rationale,
+and consequences. A decision that was later changed records the supersession in
+its body; the live note states the current verdict.
+
+## Goals & operational plan
+- **`goal` (GOAL-)** — a thematic product goal: title + description + `scope`
+  (ids of member notes). Progress is COMPUTED from scope statuses — never
+  stored. Goals are independent of the plan. Create/edit ONLY via **`kb-goal`**.
+- **`plan` (PLAN-001, singleton)** — the operational plan: `active` (WIP),
+  `queue` (TODO; LIST ORDER = execution sequence), `backlog` (parked). **done
+  is never stored** — derived from the plan note's git history. Change ONLY via
+  **`kb-plan`** → `npm run plan -- <verb>` (never Write/Edit/kb:write): the CLI
+  heals, validates (singleton, disjoint lists, live ids), reindexes, and makes
+  the atomic commit whose message the done-history relies on.
+- **`milestone` (MIL-)** — a concrete stage of product development. Semantics:
+  `proposed` = planned, `accepted` = reached; optional `due` (YYYY-MM-DD). The
+  ordered product ladder lives in the singleton **`timeline` TL-001**
+  (`sequence: [MIL-ids]`). Product states (done / in work / overdue / next /
+  planned) and the «we are here» point are DERIVED (status + due + PLAN-001) —
+  never stored.
+- Live PM dashboard: **`kb-dashboard`** → `npm run dashboard` →
+  http://localhost:4321 (read-only viewer; tabs: Продукт / Розробка / Мапа / KB).
 
 ## Mind-map (Phase 2a)
 - A `topic` note (`TOP-`) is a node of the mind-map. Its `parent` is a `TOP-` id or `null` (top-level area = a folder).
@@ -59,7 +84,8 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 ## Health & evolution (Phase 2b)
 - `index/health.md` (GENERATED) reports actionable signals: migration debt, open
   `Q-`/`RISK-`/`ASMP-`, empty topic nodes; plus heuristic orphans (and opt-in
-  duplicates via `kb.config.yml` `health.duplicates`). Regenerate: `npm run graph`.
+  duplicates via `kb.config.yml` `health.duplicates`). Regenerates automatically
+  (Stop hook + pre-commit); manual: `npm run graph`.
 - `npm run impact -- <ID>` shows a note's blast radius before evolving it.
 - `npm run install-hooks` installs the git pre-commit guard (validate = gate;
   reindex + graph = informational).
@@ -83,7 +109,8 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 - `knowledge/<domain>/...` — source notes
 - `index/` — generated (MAP, per-domain indexes, backlinks.json)
 - `tools/` — Node scripts: `validate.mjs`, `reindex.mjs`
-- `.claude/skills/` — kb-orient, kb-capture, kb-recall, kb-elicit, kb-visualize, kb-evolve, kb-sanitize
+- `.claude/skills/` — kb-orient, kb-capture, kb-recall, kb-elicit, kb-visualize,
+  kb-evolve, kb-sanitize, kb-recap, kb-goal, kb-plan, kb-dashboard
 
 ## Tooling
 - `npm run kb:write` — batch-write notes through the heal/validate pipeline.
@@ -92,6 +119,9 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
   `kb-capture`. Avoids ad-hoc temp scripts and JS-string escaping pitfalls.
 - `npm run validate` — validate all notes (also runs automatically after writes).
 - `npm run reindex` — regenerate `index/` (also runs automatically at end of turn).
+- `npm run plan -- <show|take|done|drop|defer|promote|move|set>` — deterministic
+  operational-plan surgery (used by kb-plan; never edit the plan note by hand).
+- `npm run dashboard` — live read-only PM dashboard (http://localhost:4321).
 - `npm test` — run the tool test suite.
 
 ## Mode

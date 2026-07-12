@@ -136,7 +136,59 @@ export async function validateNotes(rootDir) {
     }
   }
 
-  // 5. STATE.md scope gate — prevent derived-state drift re-entering STATE.md.
+  // 5. plan invariants (DEC-032): singleton live plan; active/queue/backlog
+  // disjoint (an id in two lists would mean two contradictory delivery states).
+  const livePlans = notes.filter(
+    n => n.frontmatter.type === 'plan' && n.frontmatter.status !== 'deprecated',
+  );
+  if (livePlans.length > 1) {
+    errors.push(`plan: expected a single live plan note, found ${livePlans.length} `
+      + `(${livePlans.map(n => n.frontmatter.id).join(', ')})`);
+  }
+  for (const plan of livePlans) {
+    const fm = plan.frontmatter;
+    const seen = new Map(); // id -> list name
+    for (const list of ['active', 'queue', 'backlog']) {
+      for (const id of fm[list] ?? []) {
+        if (seen.has(id)) {
+          errors.push(`${fm.id}: ${id} is in both "${seen.get(id)}" and "${list}" — plan lists must be disjoint`);
+        } else {
+          seen.set(id, list);
+        }
+      }
+    }
+    // plan items must reference live notes (a deprecated item hides real state)
+    const statusById = new Map(notes.map(n => [n.frontmatter.id, n.frontmatter.status]));
+    for (const [id, list] of seen) {
+      if (statusById.get(id) === 'deprecated') {
+        errors.push(`${fm.id}: ${list} item ${id} is deprecated — replace with its superseding note`);
+      }
+    }
+  }
+
+  // 6. timeline invariants (DEC-033): singleton live timeline; sequence items
+  // must be live milestone notes (order semantics belong to milestones only).
+  const liveTimelines = notes.filter(
+    n => n.frontmatter.type === 'timeline' && n.frontmatter.status !== 'deprecated',
+  );
+  if (liveTimelines.length > 1) {
+    errors.push(`timeline: expected a single live timeline note, found ${liveTimelines.length} `
+      + `(${liveTimelines.map(n => n.frontmatter.id).join(', ')})`);
+  }
+  const noteByIdTL = new Map(notes.map(n => [n.frontmatter.id, n.frontmatter]));
+  for (const tl of liveTimelines) {
+    for (const id of tl.frontmatter.sequence ?? []) {
+      const t = noteByIdTL.get(id);
+      if (!t) continue; // dangling covered by the links gate
+      if (t.type !== 'milestone') {
+        errors.push(`${tl.frontmatter.id}: sequence item ${id} is a ${t.type} — timeline holds milestones only`);
+      } else if (t.status === 'deprecated') {
+        errors.push(`${tl.frontmatter.id}: sequence item ${id} is deprecated — replace with its superseding note`);
+      }
+    }
+  }
+
+  // 7. STATE.md scope gate — prevent derived-state drift re-entering STATE.md.
   errors.push(...(await checkStateScope(rootDir)));
 
   return { errors };
