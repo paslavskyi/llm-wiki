@@ -24,13 +24,25 @@ tidy. It ships empty on purpose — you fork it and fill it with *your* domain
 
 ## What you get
 
-- **8 AI skills** that drive the whole workflow: orient, capture, recall, elicit
-  (dialogue engine), visualize (graphical mind-map), evolve, sanitize, recap.
+- **11 AI skills** that drive the whole workflow: orient, capture, recall, elicit
+  (dialogue engine), visualize, evolve, sanitize, recap — plus the PM layer:
+  **goal** (goals with computed progress), **plan** (dialogue-driven operational
+  planning), **dashboard** (live local viewer).
 - A **deterministic write pipeline** — every note is auto-validated, healed to a
   healthy state, and atomically saved (no corrupted files, stable IDs, no broken
   links).
-- **Generated indexes** for fast index-first retrieval, a **graphical mind-map**
-  (`index/mindmap.html`, fully offline), and a **health report** of gaps/debt.
+- **Generated indexes** for fast index-first retrieval, a **health report** of
+  gaps/debt, and an offline mind-map fallback (`index/mindmap.html`).
+- A **live PM dashboard** (`npm run dashboard` → http://localhost:4321,
+  read-only, no cloud): product timeline with a "we are here" marker, goals with
+  computed progress, delivery lanes (in work / ordered queue / done-from-git /
+  backlog / tech debt), an interactive mind-map with click-through to full
+  notes, and KB health. Data is computed live from your notes + git on every
+  refresh — there is nothing to regenerate or sync.
+- **Goals & operational plan as first-class notes**: goals aggregate scope
+  (progress is computed, never stored); the plan is an ordered queue + backlog
+  in one note — "done" is derived from the plan's git history, so replanning of
+  any complexity is a single small commit.
 - **Automatic persistence** — your work is committed for you (configurable).
 - It's **self-contained**: all instructions live in the repo, so any new AI
   session continues exactly where the last one left off.
@@ -39,10 +51,10 @@ tidy. It ships empty on purpose — you fork it and fill it with *your* domain
 
 | Requirement | Why | Notes |
 |---|---|---|
-| **An LLM coding agent** with skills support (e.g. Claude Code) | Runs the 8 skills + hooks | The repo carries `.claude/skills/` and `.claude/settings.json`. |
+| **An LLM coding agent** with skills support (e.g. Claude Code) | Runs the 11 skills + hooks | The repo carries `.claude/skills/` and `.claude/settings.json`. |
 | **Node.js ≥ 20** (developed on v24) | Validation, indexing, mind-map, persistence tooling | `node --version` |
 | **Git** | The knowledge base *is* a git repo; history is the only store | `git --version` |
-| A modern **web browser** | View the graphical mind-map | optional |
+| A modern **web browser** | View the live dashboard & mind-map | optional |
 
 No database, no server, no cloud. Everything is local Markdown + small Node
 scripts.
@@ -96,11 +108,16 @@ Open the repo with your LLM agent and just talk to it:
 1. **“orient”** — it reports where things stand (empty base, ready to start).
 2. **“let's capture knowledge”** — it co-designs the *map of areas* with you
    (Stage 0), then drills top-down, turning the conversation into notes.
-3. **“show the map”** — it generates the interactive mind-map and tells you how
-   to open it.
+3. **“open the dashboard”** — a live local page with your product state: map,
+   goals, plan, health (useful from day one, grows with the base).
+
+When delivery starts, add the PM layer — all by talking:
+**“Create a Goal '…' — it includes …”**, **“now we do A, then B; park E in the
+backlog”**, **“A is done”**. Progress and history are computed, never
+hand-maintained.
 
 That's it. You don't manage files, IDs, or indexes — the system does.
-See the [README command cheat-sheet](README.md#8-command-cheat-sheet) for more.
+See the [README command cheat-sheet](README.md#9-command-cheat-sheet) for more.
 
 ## How it's organized
 
@@ -110,7 +127,7 @@ index/          # GENERATED routing layer (MAP, per-domain, backlinks, mindmap, 
 kb.config.yml   # runtime config (mode, language, persistence)
 kb.framework.yml# seed: recommended top-level areas + framing questions (editable)
 .claude/        # the AI assistant: skills + hooks (the "how")
-lib/ tools/     # Node engine: validation, indexing, write pipeline, mind-map
+lib/ tools/     # Node engine: validation, indexing, write pipeline, plan CLI, dashboard
 test/           # the tooling test suite
 docs/           # design specs & implementation plans (the "why", for the curious)
 ```
@@ -143,4 +160,5 @@ and just works.
   reopen `index/mindmap.html`; it's offline (vendored d3 + markmap).
 - **The assistant edited `index/` by hand** → it shouldn't; regenerate with
   `npm run reindex`. Report it as a bug if it recurs.
+- **Dashboard port is busy** → set another port: `KB_DASH_PORT=4322 npm run dashboard`.
 - **Windows line-endings noise** → `.gitattributes` enforces LF; let git handle it.

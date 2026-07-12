@@ -17,12 +17,13 @@
 2. [З чого почати кожну сесію](#1-з-чого-почати-кожну-сесію)
 3. [Як збирати знання](#2-як-збирати-знання-основний-режим)
 4. [Подивитись зібране](#3-подивитись-що-вже-зібрано)
-5. [Змінити зібране](#4-змінити-вже-зібране)
-6. [Збереження — автоматичне](#5-збереження--автоматичне)
-7. [Налаштування](#6-налаштування-kbconfigyml)
-8. [Здоров'я бази](#7-здоровя-бази)
-9. [Шпаргалка команд](#8-типові-фрази-команди-шпаргалка)
-10. [Правила порядку](#9-кілька-правил-які-тримають-порядок-для-довідки)
+5. [Цілі, план розробки та дашборд](#4-цілі-план-розробки-та-дашборд)
+6. [Змінити зібране](#5-змінити-вже-зібране)
+7. [Збереження — автоматичне](#6-збереження--автоматичне)
+8. [Налаштування](#7-налаштування-kbconfigyml)
+9. [Здоров'я бази](#8-здоровя-бази)
+10. [Шпаргалка команд](#9-типові-фрази-команди-шпаргалка)
+11. [Правила порядку](#10-кілька-правил-які-тримають-порядок-для-довідки)
 
 ### Що це
 
@@ -73,14 +74,38 @@ KPI та маркетингові стратегії.
 
 - **«що ми вже знаємо про <тему>?»** — я знайду й перекажу (не читаючи всю базу).
   *(навичка `kb-recall`)*
-- **«покажи карту»** — я згенерую **графічну mind-map** і дам посилання, щоб
-  відкрити її у браузері (інтерактивна: масштаб, згортання гілок).
-  *(навичка `kb-visualize`; файл `index/mindmap.html`)*
+- **«покажи карту»** — інтерактивна mind-map: у дашборді (вкладка «Мапа», з
+  переходом у повний зміст нотаток) або як офлайн-файл `index/mindmap.html`.
+  *(навички `kb-dashboard` / `kb-visualize`)*
 - **«що ми робили сьогодні / цього тижня?»** або **«що змінилось щодо
   користувачів?»** — я зроблю короткий підсумок за період чи областю.
   *(навичка `kb-recap`)*
 
-### 4. Змінити вже зібране
+### 4. Цілі, план розробки та дашборд
+
+Коли починається делівері, база стає і **PM-інструментом**:
+
+- **Цілі.** Скажи: **«Створи Goal "Покращити комунікацію між агентами" — він
+  включає: …»** — я створю ціль, знайду в базі існуючі нотатки для її складу,
+  розпитаю/дослідж, сформулюю нові нотатки і додам їх у ціль. **Прогрес цілі
+  рахується сам** зі статусів її задач — його не треба оновлювати руками.
+  *(навичка `kb-goal`)*
+- **Операційний план.** Плануй розмовою: **«зараз робимо A, потім B і C»**,
+  **«E відклади в backlog»**, **«G піднімай з backlog»**, **«A зроблено»**.
+  Я веду впорядковану чергу (порядок = послідовність виконання) і backlog;
+  **виконане не зберігається списком — воно виводиться з історії змін плану**.
+  *(навичка `kb-plan`)*
+- **Timeline продукту.** Стадії розвитку одна за одною (наприклад: single-user →
+  multi-user → beta → release) з плановими датами; статуси (досягнуто / в роботі /
+  прострочено / наступна) і точка **«ми зараз тут»** обчислюються самі.
+- **Живий дашборд.** Скажи **«відкрий дашборд»** — локальна сторінка
+  (http://localhost:4321) із вкладками: **Продукт** (timeline, цілі з прогресом,
+  концепція), **Розробка** (в роботі / черга / done / техборг), **Мапа**
+  (інтерактивна mind-map), **KB** (здоров'я, динаміка). Клік на будь-який запис —
+  повний зміст нотатки. Дашборд **тільки показує** — всі зміни йдуть через діалог,
+  дані свіжі на кожне оновлення сторінки. *(навичка `kb-dashboard`)*
+
+### 5. Змінити вже зібране
 
 Знання еволюціонують. Просто скажи, що не так:
 
@@ -92,16 +117,16 @@ KPI та маркетингові стратегії.
 Я ніколи не видаляю інформацію «з кінцями» — стара завжди лишається в історії.
 *(навичка `kb-evolve`; накопичений технічний борг прибирає `kb-sanitize` на запит)*
 
-### 5. Збереження — автоматичне
+### 6. Збереження — автоматичне
 
 Тобі **не треба думати про збереження**. Система сама зберігає зміни (через git) —
-залежно від налаштування (див. розділ 6). За замовчуванням я **нагадаю**, коли
+залежно від налаштування (див. розділ 7). За замовчуванням я **нагадаю**, коли
 накопичиться достатньо незбережених змін, і збережу за твоїм словом.
 
 Уся історія зберігається автоматично — будь-яку зміну згодом можна переглянути
 чи відкотити.
 
-### 6. Налаштування (`kb.config.yml`)
+### 7. Налаштування (`kb.config.yml`)
 
 Один файл у корені керує поведінкою. Можеш не чіпати — дефолти безпечні. Якщо
 треба:
@@ -131,7 +156,7 @@ health:
 - Ти (технічний власник): `mode: debug` + `autocommit: manual` (контроль за тобою).
 - Не-технічний користувач: `mode: autonomous` + `autocommit: auto` (усе само, тихо).
 
-### 7. Здоров'я бази
+### 8. Здоров'я бази
 
 Я веду звіт `index/health.md` — він показує, де база «провисає»:
 - **відкриті питання / ризики / припущення** — над чим ще треба попрацювати;
@@ -140,21 +165,24 @@ health:
 
 Скажи **«покажи здоров'я бази»** — і я зведу це в кілька рядків «що робити далі».
 
-### 8. Типові фрази-команди (шпаргалка)
+### 9. Типові фрази-команди (шпаргалка)
 
 | Ти кажеш | Що відбувається |
 |---|---|
-| «зорієнтуйся» / «де ми?» | стан: фаза, прогрес, наступний крок |
+| «зорієнтуйся» / «де ми?» | стан: фаза, план, прогрес, наступний крок |
 | «давай збирати знання» | структурований діалог наповнення |
 | «що ми знаємо про X?» | пошук і переказ по темі |
-| «покажи карту» | графічна mind-map у браузері |
+| «покажи карту» | інтерактивна mind-map (дашборд або файл) |
+| «створи Goal "…" — включає …» | ціль зі складом і автопрогресом |
+| «зараз робимо A, потім B» / «A зроблено» | операційний план: черга/backlog/done |
+| «відкрий дашборд» | живий PM-дашборд у браузері |
 | «що ми робили сьогодні?» | підсумок змін за період |
 | «запропонуй…» / «дослідь…» | пропозиція / дослідження → у нотатки |
 | «це насправді …, а не …» | безпечна зміна типу/суті нотатки |
 | «покажи здоров'я бази» | сигнали: прогалини, питання, борг |
 | «збережи» | зафіксувати зміни в історію |
 
-### 9. Кілька правил, які тримають порядок (для довідки)
+### 10. Кілька правил, які тримають порядок (для довідки)
 
 Це робить система сама — тобі знати не обов'язково, але якщо цікаво:
 
@@ -179,12 +207,13 @@ health:
 2. [Starting a session](#1-starting-a-session)
 3. [Capturing knowledge](#2-capturing-knowledge-the-main-mode)
 4. [Reviewing what's captured](#3-reviewing-whats-captured)
-5. [Changing what's captured](#4-changing-whats-captured)
-6. [Saving is automatic](#5-saving-is-automatic)
-7. [Configuration](#6-configuration-kbconfigyml)
-8. [Knowledge-base health](#7-knowledge-base-health)
-9. [Command cheat-sheet](#8-command-cheat-sheet)
-10. [Rules that keep order](#9-rules-that-keep-order-for-reference)
+5. [Goals, delivery plan & dashboard](#4-goals-delivery-plan--dashboard)
+6. [Changing what's captured](#5-changing-whats-captured)
+7. [Saving is automatic](#6-saving-is-automatic)
+8. [Configuration](#7-configuration-kbconfigyml)
+9. [Knowledge-base health](#8-knowledge-base-health)
+10. [Command cheat-sheet](#9-command-cheat-sheet)
+11. [Rules that keep order](#10-rules-that-keep-order-for-reference)
 
 ### What this is
 
@@ -234,13 +263,36 @@ At any time you can:
 
 - **"what do we already know about <topic>?"** — I find and summarize it (without
   reading the whole base). *(`kb-recall` skill)*
-- **"show the map"** — I generate a **graphical mind-map** and give you a link to
-  open it in a browser (interactive: zoom, collapse branches).
-  *(`kb-visualize` skill; file `index/mindmap.html`)*
+- **"show the map"** — an interactive mind-map: in the dashboard («Мапа» tab,
+  with click-through to full notes) or as the offline file `index/mindmap.html`.
+  *(`kb-dashboard` / `kb-visualize` skills)*
 - **"what did we do today / this week?"** or **"what changed about users?"** — I
   give a short summary by period or area. *(`kb-recap` skill)*
 
-### 4. Changing what's captured
+### 4. Goals, delivery plan & dashboard
+
+Once delivery starts, the base doubles as a **PM tool**:
+
+- **Goals.** Say: **"Create a Goal 'Improve agent communication' — it includes: …"**
+  — I create the goal, find existing notes for its scope, ask/research to
+  formulate new ones, and add them. **Goal progress is computed** from the
+  statuses of its items — never updated by hand. *(`kb-goal` skill)*
+- **Operational plan.** Plan by talking: **"now we do A, then B and C"**,
+  **"park E in the backlog"**, **"promote G from the backlog"**, **"A is done"**.
+  I keep an ordered queue (order = execution sequence) and a backlog; **done is
+  never stored as a list — it is derived from the plan's change history**.
+  *(`kb-plan` skill)*
+- **Product timeline.** Development stages one after another (e.g. single-user →
+  multi-user → beta → release) with planned dates; states (reached / in work /
+  overdue / next) and the **"we are here"** point are computed automatically.
+- **Live dashboard.** Say **"open the dashboard"** — a local page
+  (http://localhost:4321) with tabs: **Product** (timeline, goals with progress,
+  vision), **Delivery** (in work / queue / done / tech debt), **Map** (interactive
+  mind-map), **KB** (health, trends). Click any entry for the full note. The
+  dashboard is **read-only** — all changes go through dialogue; data is fresh on
+  every page refresh. *(`kb-dashboard` skill)*
+
+### 5. Changing what's captured
 
 Knowledge evolves. Just tell me what's off:
 
@@ -253,15 +305,15 @@ Knowledge evolves. Just tell me what's off:
 I never delete information for good — the old version always remains in history.
 *(`kb-evolve` skill; accumulated technical debt is cleaned by `kb-sanitize` on request)*
 
-### 5. Saving is automatic
+### 6. Saving is automatic
 
 You **don't need to think about saving**. The system stores changes itself (via
-git), depending on the setting (see section 6). By default I'll **remind** you when
+git), depending on the setting (see section 7). By default I'll **remind** you when
 enough unsaved changes pile up, and save on your word.
 
 All history is kept automatically — any change can later be reviewed or rolled back.
 
-### 6. Configuration (`kb.config.yml`)
+### 7. Configuration (`kb.config.yml`)
 
 One file at the root controls behavior. You can leave it alone — defaults are safe.
 If needed:
@@ -291,7 +343,7 @@ health:
 - You (technical owner): `mode: debug` + `autocommit: manual` (you stay in control).
 - Non-technical user: `mode: autonomous` + `autocommit: auto` (all automatic, quiet).
 
-### 7. Knowledge-base health
+### 8. Knowledge-base health
 
 I maintain an `index/health.md` report showing where the base is thin:
 - **open questions / risks / assumptions** — what still needs work;
@@ -300,21 +352,24 @@ I maintain an `index/health.md` report showing where the base is thin:
 
 Say **"show the base health"** and I'll boil it down to a few "what's next" lines.
 
-### 8. Command cheat-sheet
+### 9. Command cheat-sheet
 
 | You say | What happens |
 |---|---|
-| "orient" / "where are we?" | state: phase, progress, next step |
+| "orient" / "where are we?" | state: phase, plan, progress, next step |
 | "let's capture knowledge" | structured capture dialogue |
 | "what do we know about X?" | search and summary by topic |
-| "show the map" | graphical mind-map in the browser |
+| "show the map" | interactive mind-map (dashboard or file) |
+| "create a Goal '…' — it includes …" | goal with scope and auto-progress |
+| "now we do A, then B" / "A is done" | operational plan: queue/backlog/done |
+| "open the dashboard" | live PM dashboard in the browser |
 | "what did we do today?" | summary of changes over a period |
 | "propose…" / "research…" | proposal / research → into notes |
 | "this is actually …, not …" | safe change of a note's type/meaning |
 | "show the base health" | signals: gaps, questions, debt |
 | "save" | commit changes to history |
 
-### 9. Rules that keep order (for reference)
+### 10. Rules that keep order (for reference)
 
 The system does this itself — you needn't know, but if you're curious:
 
