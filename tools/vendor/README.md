@@ -8,7 +8,8 @@ Do not edit by hand — re-download to upgrade.
 | d3.min.js | d3 | 7.9.0 | https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js | BSD-3-Clause |
 | markmap-view.min.js | markmap-view | 0.18.10 | https://cdn.jsdelivr.net/npm/markmap-view@0.18.10/dist/browser/index.js | MIT |
 
-To upgrade: re-run the curl commands in the Phase 2a plan (Task 5) with new
+To upgrade: re-run the curl commands in
+`docs/superpowers/plans/2026-05-30-llm-wiki-phase2a.md` (Task 5) with new
 versions and update this table.
 
 ## Browser API (verified against markmap-view@0.18.10)

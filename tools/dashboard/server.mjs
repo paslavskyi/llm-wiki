@@ -1,9 +1,9 @@
-// KB dashboard server — read-only viewer over knowledge/ (DEC-031, DEC-032).
+// KB dashboard server — read-only viewer over knowledge/.
 // Serves the hand-written SPA in public/ and a GET-only JSON API computed
 // live from note frontmatter + git history. Never writes to the KB.
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { join, dirname, extname, resolve, sep } from 'node:path';
+import { join, dirname, extname, resolve, sep, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -138,6 +138,7 @@ async function buildDashboard() {
   const stripBody = ({ body, filePath, ...rest }) => rest;
   return {
     generatedAt: new Date().toISOString(),
+    repo: basename(ROOT),
     git: gitMeta,
     state,
     totals: {
@@ -291,7 +292,7 @@ function sendJson(res, status, data) {
 }
 
 const server = createServer(async (req, res) => {
-  if (req.method !== 'GET') { // read-only by construction (DEC-031/032)
+  if (req.method !== 'GET') { // read-only by construction
     res.writeHead(405, { allow: 'GET' }); res.end('read-only');
     return;
   }

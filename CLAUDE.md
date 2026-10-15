@@ -80,14 +80,14 @@ its body; the live note states the current verdict.
 - Live PM dashboard: **`kb-dashboard`** → `npm run dashboard` →
   http://localhost:4321 (read-only viewer; tabs: Продукт / Розробка / Мапа / KB).
 
-## Mind-map (Phase 2a)
+## Mind-map
 - A `topic` note (`TOP-`) is a node of the mind-map. Its `parent` is a `TOP-` id or `null` (top-level area = a folder).
 - A concrete note attaches to a node via its `topic: TOP-xxx` field.
 - `parent`/`topic` must resolve to an existing `topic` note (validated).
 - Generated views: `index/mindmap.md` (text, auto), `index/mindmap.html` (graphical, via `kb-visualize`).
 - Dialogue engine: run **`kb-elicit`** to gather knowledge; **`kb-visualize`** to see the graphical map. Stage-0 seed is `kb.framework.yml`.
 
-## Health & evolution (Phase 2b)
+## Health & evolution
 - `index/health.md` (GENERATED) reports actionable signals: migration debt, open
   `Q-`/`RISK-`/`ASMP-`, empty topic nodes; plus heuristic orphans (and opt-in
   duplicates via `kb.config.yml` `health.duplicates`). Regenerates automatically
@@ -97,7 +97,7 @@ its body; the live note states the current verdict.
   reindex + graph = informational).
 - Evolve notes with **`kb-evolve`**; clear migration debt in bulk with **`kb-sanitize`**.
 
-## Persistence & recap (Phase 2c)
+## Persistence & recap
 - Persistence is automatic and invisible: a UserPromptSubmit hook evaluates
   uncommitted `knowledge/` changes (untracked/modified/deleted) every message.
   Per `kb.config.yml` `persistence.autocommit`: `off` (silent), `manual` (nudge
@@ -114,7 +114,15 @@ its body; the live note states the current verdict.
 ## Folder map
 - `knowledge/<domain>/...` — source notes
 - `index/` — generated (MAP, per-domain indexes, backlinks.json)
-- `tools/` — Node scripts: `validate.mjs`, `reindex.mjs`
+- `tools/` — Node CLIs: write pipeline (`write-note.mjs`, `kb-write.mjs`),
+  `validate.mjs`, `reindex.mjs`, `graph.mjs`, `impact.mjs`, `plan.mjs`,
+  `mindmap-html.mjs`, `dashboard/`, hooks (`user-prompt-hook.mjs`,
+  `should-commit.mjs`, `auto-commit.mjs`, `session-delta.mjs`, `hooks/`,
+  `install-hooks.mjs`); JSON schemas in `tools/schema/`, vendored JS in `tools/vendor/`
+- `lib/` — pure/shared modules (heal, vocabulary, schemas, config, plan, mind-map…)
+- `test/` — `node --test` suite for `lib/` + `tools/`
+- `docs/superpowers/` — the engine's own design specs & build plans (history,
+  not product knowledge; safe to delete in a fork)
 - `.claude/skills/` — kb-orient, kb-capture, kb-recall, kb-elicit, kb-visualize,
   kb-evolve, kb-sanitize, kb-recap, kb-goal, kb-plan, kb-dashboard
 
@@ -133,4 +141,4 @@ its body; the live note states the current verdict.
 
 ## Mode
 `mode: debug` (default) — report reads/writes/changes explicitly.
-`mode: autonomous` — short human acknowledgements only; hide wiki mechanics. (Phase 2.)
+`mode: autonomous` — short human acknowledgements only; hide wiki mechanics.

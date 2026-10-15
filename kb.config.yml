@@ -1,7 +1,7 @@
 # Knowledge base runtime config. Read first in every session.
-mode: debug          # debug | autonomous  (Phase 1: debug only; autonomous is Phase 2)
+mode: debug          # debug | autonomous
 language: uk
-owner: Andrii
+owner: ""           # your name
 
 persistence:
   autocommit: manual     # off | manual | auto
@@ -10,3 +10,8 @@ persistence:
   remind_every_hours: 4  # manual: debounce reminders (anti-noise)
   hard_safety_net: false # optional technical auto-commit fallback
   hard_threshold: 50     # (if hard_safety_net) higher volume threshold
+
+health:
+  duplicates:
+    enabled: false       # flag likely-duplicate notes in index/health.md (can be noisy)
+    threshold: 0.92      # title similarity (Jaro-Winkler) to count as a duplicate

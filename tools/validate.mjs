@@ -140,7 +140,7 @@ export async function validateNotes(rootDir) {
     }
   }
 
-  // 5. plan invariants (DEC-032): singleton live plan; active/queue/backlog
+  // 5. plan invariants: singleton live plan; active/queue/backlog
   // disjoint (an id in two lists would mean two contradictory delivery states).
   const livePlans = notes.filter(
     n => n.frontmatter.type === 'plan' && n.frontmatter.status !== 'deprecated',
@@ -170,7 +170,7 @@ export async function validateNotes(rootDir) {
     }
   }
 
-  // 6. timeline invariants (DEC-033): singleton live timeline; sequence items
+  // 6. timeline invariants: singleton live timeline; sequence items
   // must be live milestone notes (order semantics belong to milestones only).
   const liveTimelines = notes.filter(
     n => n.frontmatter.type === 'timeline' && n.frontmatter.status !== 'deprecated',

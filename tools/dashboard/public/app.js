@@ -1,5 +1,5 @@
 // Altus product dashboard client — renders /api/dashboard + /api/note/:id.
-// Read-only viewer (DEC-031/032): plan changes happen in dialogue (kb-plan).
+// Read-only viewer: plan changes happen in dialogue (kb-plan).
 'use strict';
 
 const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -61,6 +61,7 @@ function renderList(el, items, opts = {}) {
 /* ── header / hero ─────────────────────────────────────────────── */
 
 function renderHeader(d) {
+  $('repo-name').textContent = d.repo ?? '?';
   $('git-branch').textContent = d.git?.branch ?? '?';
   $('git-commit').textContent = d.git ? `${d.git.lastCommit.hash} ${d.git.lastCommit.date}` : 'git недоступний';
   $('notes-total').textContent = `${d.totals.live} нотаток`;
@@ -85,7 +86,7 @@ const TL_STATE_LABELS = {
 function renderTimeline(d) {
   const box = $('timeline');
   if (!d.timeline || !d.timeline.stages.length) {
-    box.innerHTML = '<div class="empty">Timeline не заданий — створи TL-001 зі стадіями (DEC-033)</div>';
+    box.innerHTML = '<div class="empty">Timeline не заданий — створи TL-001 зі стадіями</div>';
     return;
   }
   const { stages, nowIndex } = d.timeline;

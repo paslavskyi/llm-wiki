@@ -13,8 +13,7 @@ Before writing, use the `kb-recall` skill to check whether this concept already 
 - Related but distinct → **create** a new note and add a `links` entry to the related one.
 - Nothing found → **create** a new note.
 If the update would ripple to other notes (their meaning depends on this change),
-stop and hand off to `kb-evolve` (Phase 2). For Phase 1, note the ripple in your
-response and update only this note.
+stop and hand off to `kb-evolve`.
 
 ### Recurring-concern check (avoid duplicating a thought across note bodies)
 `resolve` above catches duplicate NOTES. This catches a duplicate THOUGHT — the
@@ -73,5 +72,5 @@ Before writing a risk / assumption / trade-off / caveat into a note body, ask:
 
 ## Rules
 - One concept per note. If you're writing two ideas, make two notes.
-- Never reuse or delete an id. To retire a note, deprecate it (Phase 2 `kb-evolve`).
+- Never reuse or delete an id. To retire a note, deprecate it (`kb-evolve`).
 - Never hand-edit `index/`.

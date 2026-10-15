@@ -15,7 +15,7 @@ questions — without loading the whole knowledge base.
 2. Read `STATE.md` — current focus + next step (intent ONLY; it does not hold counts/progress).
 3. Read `index/MAP.md` — domains and note counts. Do NOT open individual notes yet. This is the
    AUTHORITATIVE source for counts/progress; if `STATE.md` ever disagrees, MAP/health win.
-4. If `index/health.md` exists (Phase 2+), read it for open questions/risks.
+4. If `index/health.md` exists, read it for open questions/risks.
 5. Run `npm run plan -- show` — the operational plan (в розробці / черга /
    backlog + recent done). This is the delivery half of "where we are"; STATE
    holds only strategic intent. Goals/timeline: `index/roadmap.index.md` if needed.

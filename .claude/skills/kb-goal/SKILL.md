@@ -7,13 +7,14 @@ description: Use when the owner creates or edits a product Goal in dialogue — 
 
 Goal: a `goal` note (GOAL-, domain roadmap) = назва + опис + `scope` (ids of
 member notes). Progress is COMPUTED (share of scope with status `accepted`) —
-never stored. Goals are orthogonal to PLAN-001 (DEC-032): scope items may sit
+never stored. Goals are orthogonal to PLAN-001: scope items may sit
 in the plan's queue, backlog, or nowhere.
 
 ## Flow for «Створи Goal "..." — він включає <ідеї/пункти>»
-1. **Create the note** via kb-capture conventions (next free GOAL- id from
-   `index/roadmap.index.md`; type `goal`; `scope: []`; topic — usually TOP-008;
-   write through `npm run kb:write`).
+1. **Create the note** via kb-capture conventions (omit `id` — the pipeline
+   assigns the next GOAL-; type `goal`; domain `roadmap`; `scope: []`; topic —
+   the roadmap area's TOP- node, if the map has one; write through
+   `npm run kb:write`).
 2. **Discover existing knowledge**: use kb-recall (MAP → domain indexes →
    notes) for each idea the owner listed. Report what was found and WHY it
    belongs; add confident matches to `scope`, ask about doubtful ones.

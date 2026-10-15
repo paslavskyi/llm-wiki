@@ -6,7 +6,7 @@ description: Use to start (or point the user to) the live PM dashboard of this k
 # kb-dashboard — live PM dashboard
 
 Goal: give the human a visual, always-fresh view of project state without any
-regeneration step. Architecture: DEC-031 (hand-written SPA + read-only REST API).
+regeneration step. Architecture: hand-written SPA + read-only REST API.
 
 ## Steps
 1. Start the server (if not already running):
@@ -30,4 +30,4 @@ regeneration step. Architecture: DEC-031 (hand-written SPA + read-only REST API)
   all knowledge writes still go exclusively through the write pipeline.
 - `tools/dashboard/` is hand-maintained SOURCE code (not a generated artifact —
   it does not live in `index/`). Vendored libs live in `tools/dashboard/public/vendor/`.
-- Do not add write endpoints. Ever. (DEC-031.)
+- Do not add write endpoints. Ever.

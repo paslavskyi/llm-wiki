@@ -6,9 +6,9 @@ description: Use when the owner talks about the operational development plan in 
 # kb-plan — dialogue-driven operational planning
 
 Goal: turn planning statements into deterministic plan operations. The mechanics
-live in `tools/plan.mjs` (DEC-032); this skill ONLY translates language → commands.
+live in `tools/plan.mjs`; this skill ONLY translates language → commands.
 
-## Model (DEC-032)
+## Model
 - `PLAN-001` (singleton, type `plan`): `active` (в розробці), `queue` (TODO,
   ORDER = execution sequence), `backlog` (parked).
 - **done is never stored** — it is derived from the plan note's git history.

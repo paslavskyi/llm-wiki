@@ -134,7 +134,7 @@ KPI та маркетингові стратегії.
 ```yaml
 mode: debug            # debug = я показую деталі (ID, що змінив); autonomous = коротко й по-людськи
 language: uk           # мова відповідей
-owner: Andrii          # твоє ім'я
+owner: ""              # твоє ім'я
 
 persistence:
   autocommit: manual   # off = не зберігати само; manual = нагадувати; auto = зберігати автоматично
@@ -321,7 +321,7 @@ If needed:
 ```yaml
 mode: debug            # debug = I show details (IDs, what I changed); autonomous = short & human
 language: uk           # response language
-owner: Andrii          # your name
+owner: ""              # your name
 
 persistence:
   autocommit: manual   # off = don't save by itself; manual = remind; auto = save automatically

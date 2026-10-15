@@ -1,4 +1,4 @@
-// plan CLI — the ONLY sanctioned way to change the operational plan (DEC-032).
+// plan CLI — the ONLY sanctioned way to change the operational plan.
 // Deterministic list surgery + pipeline write + validate + reindex + an atomic
 // git commit whose message plan-history relies on. The kb-plan skill translates
 // dialogue into these commands; it never edits YAML by hand.

@@ -7,7 +7,7 @@ description: Use to show the graphical, interactive mind-map of the knowledge ba
 
 Goal: let the human see and navigate the topic graph in a browser.
 
-## Primary: live map in the dashboard (DEC-031/032)
+## Primary: live map in the dashboard
 1. Ensure the dashboard server runs (`kb-dashboard` skill / `npm run dashboard`).
 2. Point the user to **http://localhost:4321 → вкладка «Мапа»**.
    - Always current (computed from knowledge/ per request; ⟳/F5 refreshes).
