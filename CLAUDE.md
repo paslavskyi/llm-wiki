@@ -115,7 +115,9 @@ whose `revisit` date has passed.
   stored. Goals are independent of the plan. Create/edit ONLY via **`kb-goal`**.
 - **`plan` (PLAN-001, singleton)** — the operational plan: `active` (WIP),
   `queue` (TODO; LIST ORDER = execution sequence), `backlog` (parked). **done
-  is never stored** — derived from the plan note's git history. Change ONLY via
+  is never stored** — derived from the plan note's git history. Item dependencies
+  are `relations.depends_on` on the items (acyclic, validated); `show` marks blocked
+  items and the next ready one, `take` without an id starts the next ready item. Change ONLY via
   **`kb-plan`** → `npm run plan -- <verb>` (never Write/Edit/kb:write): the CLI
   heals, validates (singleton, disjoint lists, live ids), reindexes, and makes
   the atomic commit whose message the done-history relies on.

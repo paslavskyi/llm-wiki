@@ -15,12 +15,18 @@ live in `tools/plan.mjs`; this skill ONLY translates language → commands.
   That is why every operation makes its own commit with a canonical message.
 - Goals (`GOAL-`) are independent of the plan; a plan item may be any live note
   id (MIL/FEAT/FR/RISK/Q/GOAL/...).
+- **Dependencies** live on the items, not the plan: `relations: { depends_on: [ids] }`
+  (via kb-capture; cycles fail validate). A dependency is met when its note is
+  accepted, deprecated, or done per plan history. `show` marks blocked queue items
+  (⛔ чекає: …) and prints НАСТУПНЕ ГОТОВЕ; `take` with no id starts that item, not
+  the queue head; `take X` on a blocked item warns — tell the owner what it waits on.
+  «X залежить від Y» → add `depends_on: [Y]` to X (kb-capture), not a plan verb.
 
 ## Verb mapping (run via `npm run plan -- <verb> ...`)
 | Owner says | Command |
 |---|---|
 | «зараз робимо X, потім Y, Z» | `set --active X --queue Y,Z` (confirm what happens to items currently in lists but not mentioned — done/drop/backlog?) |
-| «беремо X в роботу» / «беремо наступну» | `take X` / `take` |
+| «беремо X в роботу» / «беремо наступну» | `take X` / `take` (= next READY, skips blocked) |
 | «X зроблено / готово» | `done X` |
 | «X більше не актуально, прибери» | `drop X` (NOT done — history distinguishes by message) |
 | «відклади X у backlog / колись повернемось» | `defer X` |

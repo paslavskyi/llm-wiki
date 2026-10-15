@@ -7,7 +7,7 @@ import { loadValidators } from '../lib/schemas.mjs';
 import { findDuplicateTopLevelKeys } from '../lib/frontmatter-keys.mjs';
 import { checkVocabulary } from '../lib/vocabulary.mjs';
 import { checkMarkers } from '../lib/markers.mjs';
-import { checkRelations } from '../lib/relations.mjs';
+import { checkRelations, dependencyCycles } from '../lib/relations.mjs';
 import { checkAcceptance } from '../lib/acceptance.mjs';
 import { checkDecision } from '../lib/decision.mjs';
 import { checkValidation } from '../lib/assumption.mjs';
@@ -130,6 +130,11 @@ export async function validateNotes(rootDir) {
     for (const ref of note.criterionRefs ?? []) {
       if (!criteria.has(ref)) errors.push(`${note.frontmatter.id ?? note.fileName}: criterion ${ref} does not exist`);
     }
+  }
+
+  // 3c. depends_on must be acyclic
+  for (const cyc of dependencyCycles(notes)) {
+    errors.push(`depends_on cycle: ${[...cyc, cyc[0]].join(' → ')}`);
   }
 
   // 4. parent/topic must resolve to an existing topic note

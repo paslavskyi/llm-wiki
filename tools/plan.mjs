@@ -5,7 +5,8 @@
 //
 // Usage:
 //   node tools/plan.mjs show
-//   node tools/plan.mjs take [ID]            # start item (default: queue head)
+//   node tools/plan.mjs take [ID]            # start item (default: first READY queue
+//                                            #   item — its depends_on accepted/done)
 //   node tools/plan.mjs done ID              # completed → leaves the plan
 //   node tools/plan.mjs drop ID              # removed, NOT completed
 //   node tools/plan.mjs defer ID             # park to backlog (accepts new ids)
@@ -18,7 +19,7 @@ import { dirname, join, relative } from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { loadNotes } from '../lib/load-notes.mjs';
-import { applyPlanOp } from '../lib/plan-core.mjs';
+import { applyPlanOp, planReadiness } from '../lib/plan-core.mjs';
 import { loadPlanHistory } from '../lib/plan-history.mjs';
 import { writeNote } from './write-note.mjs';
 import { validateNotes } from './validate.mjs';
@@ -47,7 +48,7 @@ async function loadKb() {
   const notes = await loadNotes(ROOT);
   const byId = new Map(notes.map(n => [n.frontmatter.id, n]));
   const plan = notes.find(n => n.frontmatter.type === 'plan' && n.frontmatter.status !== 'deprecated');
-  return { byId, plan };
+  return { notes, byId, plan };
 }
 
 function assertKnownIds(ids, byId, planId) {
@@ -62,14 +63,16 @@ function assertKnownIds(ids, byId, planId) {
   }
 }
 
-function fmtLists(fm) {
+function fmtLists(fm, readiness) {
+  const mark = x => (readiness.blocked[x] ? `${x}  ⛔ чекає: ${readiness.blocked[x].join(', ')}` : x);
   const line = (name, items, ordered = false) => items.length
-    ? `${name}:\n${items.map((x, i) => `  ${ordered ? `${i + 1}. ` : '- '}${x}`).join('\n')}`
+    ? `${name}:\n${items.map((x, i) => `  ${ordered ? `${i + 1}. ` : '- '}${mark(x)}`).join('\n')}`
     : `${name}: (порожньо)`;
   return [
     line('АКТИВНІ (в розробці)', fm.active ?? []),
     line('ЧЕРГА (TODO, у порядку виконання)', fm.queue ?? [], true),
     line('BACKLOG', fm.backlog ?? []),
+    `НАСТУПНЕ ГОТОВЕ: ${readiness.next ?? '(немає — черга порожня або все заблоковано)'}`,
   ].join('\n');
 }
 
@@ -79,21 +82,35 @@ if (!args.verb) {
   process.exit(2);
 }
 
-const { byId, plan } = await loadKb();
+const { notes, byId, plan } = await loadKb();
 if (!plan) {
   console.error('plan: no live plan note found — create PLAN-001 first (kb-capture / kb:write)');
   process.exit(1);
 }
 
+const hist = await loadPlanHistory(ROOT);
+const doneIds = new Set(hist.done.map(e => e.id));
+const readinessOf = fm => planReadiness(fm.queue ?? [], notes, doneIds);
+
 if (args.verb === 'show') {
   console.log(`${plan.frontmatter.id} — ${plan.frontmatter.title}\n`);
-  console.log(fmtLists(plan.frontmatter));
-  const hist = await loadPlanHistory(ROOT);
+  console.log(fmtLists(plan.frontmatter, readinessOf(plan.frontmatter)));
   if (hist.done.length) {
     console.log('\nDONE (нещодавні):');
     for (const e of hist.done.slice(0, 10)) console.log(`  ✓ ${e.id}  ${e.date}  (${e.hash})`);
   }
   process.exit(0);
+}
+
+// 0. take: default to the first READY item; warn when starting a blocked one
+if (args.verb === 'take') {
+  args.id ??= readinessOf(plan.frontmatter).next ?? undefined;
+  if (!args.id) {
+    console.error('plan take: no ready item in the queue (empty, or all blocked by depends_on)');
+    process.exit(1);
+  }
+  const unmet = planReadiness([args.id], notes, doneIds).blocked[args.id];
+  if (unmet) console.warn(`⚠ ${args.id} still waits on: ${unmet.join(', ')}`);
 }
 
 // 1. deterministic surgery (pure)
@@ -128,4 +145,4 @@ if (args.commit) {
 } else {
   console.log(`✓ ${message} (NOT committed — done-history lags until you commit)`);
 }
-console.log('\n' + fmtLists(fm));
+console.log('\n' + fmtLists(fm, readinessOf(fm)));
