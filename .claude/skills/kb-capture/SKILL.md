@@ -68,6 +68,13 @@ Before writing a risk / assumption / trade-off / caveat into a note body, ask:
   self-refs, keeps unknown fields verbatim) and writes atomically.
 - Do NOT hand-edit `index/`.
 
+### Acceptance criteria (requirement / nfr / story)
+State how we'll know it's done as `acceptance:` — one testable criterion per item,
+EARS (`WHEN <trigger> THE SYSTEM SHALL <response>`) or Given/When/Then, in the
+KB language. Pass plain strings; the pipeline numbers them `<ID>.<n>`. Make quality
+words measurable ("under 2 s at p95", not "fast"). Add `verify:` when the check
+isn't obvious.
+
 ### Uncertainty inside the note
 Never guess silently. Where a detail is unknown, write `[NEEDS CLARIFICATION: …]`;
 where you filled a gap with a guess, write `[ASSUMPTION: …]`. A note with markers

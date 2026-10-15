@@ -2,20 +2,94 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "base",
   "type": "object",
-  "required": ["id", "type", "title", "status", "summary"],
+  "required": [
+    "id",
+    "type",
+    "title",
+    "status",
+    "summary"
+  ],
   "properties": {
-    "id": { "type": "string", "pattern": "^[A-Z]+-[A-Za-z0-9-]+$" },
-    "type": { "type": "string" },
-    "title": { "type": "string", "minLength": 1 },
-    "status": { "enum": ["draft", "proposed", "accepted", "deprecated"] },
-    "summary": { "type": "string", "minLength": 1 },
-    "tags": { "type": "array", "items": { "type": "string" } },
-    "links": { "type": "array", "items": { "type": "string" } },
-    "topic": { "type": "string", "pattern": "^TOP-[0-9]+$" },
-    "sources": { "type": "array", "items": { "type": "string" } },
-    "relations": { "type": "object" },
-    "created": { "type": "string" },
-    "updated": { "type": "string" },
-    "superseded_by": { "type": ["string", "null"] }
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z]+-[A-Za-z0-9-]+$"
+    },
+    "type": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "proposed",
+        "accepted",
+        "deprecated"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "topic": {
+      "type": "string",
+      "pattern": "^TOP-[0-9]+$"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "relations": {
+      "type": "object"
+    },
+    "created": {
+      "type": "string"
+    },
+    "updated": {
+      "type": "string"
+    },
+    "superseded_by": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "acceptance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "text"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "verify": {
+            "type": "string"
+          }
+        }
+      }
+    }
   }
 }

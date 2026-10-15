@@ -5,6 +5,8 @@
 | Rule | Covered | % |
 |---|---|---|
 | Must-have requirements with no story, feature or milestone | 0/0 | — |
+| Must-have requirements without acceptance criteria | 0/0 | — |
+| Stories without acceptance criteria | 0/0 | — |
 | Features that address no pain/JTBD and serve no persona/segment | 0/0 | — |
 | Personas with no JTBD or pain | 0/0 | — |
 | Pains nothing addresses | 0/0 | — |

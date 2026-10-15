@@ -9,6 +9,7 @@ import { OPEN_TYPES, isOpenNote } from '../lib/open.mjs';
 import { EVIDENCE_TYPES } from '../lib/vocabulary.mjs';
 import { findMarkers } from '../lib/markers.mjs';
 import { computeCoverage } from '../lib/coverage.mjs';
+import { criterionForm, isVague } from '../lib/acceptance.mjs';
 
 const BANNER = '<!-- GENERATED — do not edit by hand. Run: node tools/graph.mjs -->';
 
@@ -84,7 +85,18 @@ export async function buildHealth(rootDir, opts = {}) {
       && !(backlinks.get(n.frontmatter.id) ?? []).length)
     .map(n => n.frontmatter.id).sort();
 
-  // Tier 2.3 possible duplicates (opt-in)
+  // Tier 2.3 acceptance-criteria quality (form + measurability)
+  const live = notes.filter(n => n.frontmatter.status !== 'deprecated');
+  const criteria = live.flatMap(n => (Array.isArray(n.frontmatter.acceptance) ? n.frontmatter.acceptance : []))
+    .filter(c => c?.id);
+  const informal = criteria.filter(c => !criterionForm(c.text)).map(c => c.id).sort();
+  const vague = [
+    ...criteria.filter(c => isVague(c.text)).map(c => c.id),
+    ...live.filter(n => ['requirement', 'nfr'].includes(n.frontmatter.type) && isVague(n.frontmatter.summary))
+      .map(n => n.frontmatter.id),
+  ].sort();
+
+  // Tier 2.4 possible duplicates (opt-in)
   const dupes = [];
   if (opts.duplicates) {
     const threshold = opts.threshold ?? 0.92;
@@ -133,6 +145,10 @@ export async function buildHealth(rootDir, opts = {}) {
     : '_none_\n';
   md += `\n### Orphan notes (no links in or out)\n`;
   md += orphans.length ? orphans.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
+  md += `\n### Acceptance criteria not in EARS / Given-When-Then form\n`;
+  md += informal.length ? informal.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
+  md += `\n### Vague wording without a number\n`;
+  md += vague.length ? vague.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Accepted claims without evidence\n`;
   md += unsupported.length ? unsupported.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Unused sources\n`;

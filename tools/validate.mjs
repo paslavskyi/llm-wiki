@@ -8,6 +8,7 @@ import { findDuplicateTopLevelKeys } from '../lib/frontmatter-keys.mjs';
 import { checkVocabulary } from '../lib/vocabulary.mjs';
 import { checkMarkers } from '../lib/markers.mjs';
 import { checkRelations } from '../lib/relations.mjs';
+import { checkAcceptance } from '../lib/acceptance.mjs';
 import { domainOf } from '../lib/domain.mjs';
 
 // STATE.md is intent-only (see CLAUDE.md → "STATE.md scope"): it must never hold
@@ -97,6 +98,7 @@ export async function validateNotes(rootDir) {
 
     for (const e of checkVocabulary(fm, domainOf(note.filePath))) errors.push(`${id}: ${e}`);
     for (const e of checkMarkers(fm, note.body)) errors.push(`${id}: ${e}`);
+    for (const e of checkAcceptance(fm)) errors.push(`${id}: ${e}`);
 
     if (!note.fileName.startsWith(`${id}-`) && note.fileName !== `${id}.md`) {
       errors.push(`${id}: filename "${note.fileName}" must start with the id`);
@@ -114,6 +116,15 @@ export async function validateNotes(rootDir) {
       if (!ids.has(target)) {
         errors.push(`${note.frontmatter.id ?? note.fileName}: dangling link → ${target}`);
       }
+    }
+  }
+
+  // 3b. criterion references (FR-012.1) must name an existing criterion
+  const criteria = new Set(notes.flatMap(n => (Array.isArray(n.frontmatter.acceptance) ? n.frontmatter.acceptance : [])
+    .map(c => c?.id).filter(Boolean)));
+  for (const note of notes) {
+    for (const ref of note.criterionRefs ?? []) {
+      if (!criteria.has(ref)) errors.push(`${note.frontmatter.id ?? note.fileName}: criterion ${ref} does not exist`);
     }
   }
 

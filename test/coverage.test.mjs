@@ -69,6 +69,6 @@ test('reindex writes index/coverage.md; health points to it', async () => {
     assert.match(md, /Must-have requirements[^\n]*\| 0\/1 \| 0%/);
     assert.match(md, /- FR-001/);
     const { markdown } = await buildHealth(dir);
-    assert.match(markdown, /### Coverage gaps\n- 1 gap\(s\) across 1 rule\(s\) — see index\/coverage\.md/);
+    assert.match(markdown, /### Coverage gaps\n- 2 gap\(s\) across 2 rule\(s\) — see index\/coverage\.md/);
   } finally { await cleanup(dir); }
 });

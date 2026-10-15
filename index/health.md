@@ -24,6 +24,12 @@ _none_
 ### Orphan notes (no links in or out)
 _none_
 
+### Acceptance criteria not in EARS / Given-When-Then form
+_none_
+
+### Vague wording without a number
+_none_
+
 ### Accepted claims without evidence
 _none_
 

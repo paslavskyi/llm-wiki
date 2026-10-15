@@ -82,6 +82,14 @@ lives only in its own domain folder.
 
 `requirement` priority values: `must | should | could | wont`.
 
+Acceptance criteria (requirement / nfr / story): `acceptance: [{id, text, verify?}]`.
+Write `text` as EARS (`WHEN … THE SYSTEM SHALL …`; uk: `КОЛИ … СИСТЕМА ПОВИННА …`)
+or Given/When/Then (uk: ДАНО/КОЛИ/ТОДІ); a plain string list is fine — the pipeline
+assigns ids `<NOTE-ID>.<n>` and never renumbers. Cite one criterion as `FR-012.1`
+(links/relations/`[[FR-012.1]]`; validated). Health flags criteria in neither form
+and quality words (fast, secure, зручно…) with no number; coverage flags
+must-requirements and stories without criteria.
+
 The `decisions` domain is the product/architecture decision log (ADR-style): one
 note per significant decision, each recording context, the decision, rationale,
 and consequences. A decision that was later changed records the supersession in
