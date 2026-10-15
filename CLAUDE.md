@@ -15,8 +15,10 @@ The interface is an LLM (you).
    History lives in git (`kb-recap`); there is no journal.
 
 ## Session protocol
-1. Read `kb.config.yml` (`mode`, `language`).
-2. Run **`kb-orient`** (STATE + MAP; never the whole repo).
+1. A SessionStart hook injects a `[kb] session snapshot` (mode, language, focus,
+   plan, attention counts). Respond in its `language`, in its `mode`.
+2. Before substantial work run **`kb-orient`** for the full picture (never the
+   whole repo).
 3. Capture only via **`kb-capture`**; retrieve via **`kb-recall`** (index-first).
 
 ## Invariants

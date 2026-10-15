@@ -30,6 +30,16 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node tools/session-start.mjs"
+          }
+        ]
+      }
     ]
   }
 }

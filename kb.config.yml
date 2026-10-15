@@ -11,6 +11,9 @@ persistence:
   hard_safety_net: false # optional technical auto-commit fallback
   hard_threshold: 50     # (if hard_safety_net) higher volume threshold
 
+session:
+  budget_bytes: 1500     # SessionStart snapshot size cap (bytes)
+
 health:
   duplicates:
     enabled: false       # flag likely-duplicate notes in index/health.md (can be noisy)

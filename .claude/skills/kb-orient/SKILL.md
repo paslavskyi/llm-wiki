@@ -9,6 +9,8 @@ Goal: in seconds, know the current phase, what's done, what's next, and open
 questions — without loading the whole knowledge base.
 
 ## Steps
+0. The SessionStart hook already put a `[kb] session snapshot` in context
+   (focus, plan, attention counts) — start from it; the steps below expand it.
 1. Read `kb.config.yml`. Note `mode` and `language`. Respond in `language`.
    - `debug`: report what you read and the full picture.
    - `autonomous`: give only a short human summary of where things stand.
