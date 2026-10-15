@@ -115,6 +115,7 @@ export async function validateNotes(rootDir) {
   }
 
   // 4. parent/topic must resolve to an existing topic note
+  const typeById = new Map(notes.map(n => [n.frontmatter.id, n.frontmatter.type]));
   const topicIds = new Set(
     notes.filter(n => n.frontmatter.type === 'topic' && n.frontmatter.id)
          .map(n => n.frontmatter.id)
@@ -128,6 +129,11 @@ export async function validateNotes(rootDir) {
         errors.push(`${who}: parent → ${parent} does not exist`);
       } else if (!topicIds.has(parent)) {
         errors.push(`${who}: parent → ${parent} must point to a topic note`);
+      }
+    }
+    for (const s of Array.isArray(fm.sources) ? fm.sources : []) {
+      if (ids.has(s) && typeById.get(s) !== 'source') {
+        errors.push(`${who}: sources → ${s} must point to a source note`);
       }
     }
     const topic = fm.topic;

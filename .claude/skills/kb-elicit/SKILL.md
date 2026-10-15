@@ -35,7 +35,8 @@ saving each note only once it is a logically consistent, complete thought.
 4. Anything unresolved becomes a note, not a dropped thread: open question -> `Q-`,
    assumption -> `ASMP-`, risk -> `RISK-`, attached to the same node.
 5. On request, propose options or research (web/evidence) and fold conclusions
-   back into notes (cite sources for research).
+   back into notes — every external finding becomes a `source` note (SRC-) cited
+   via `sources:` (see kb-capture → Evidence check).
 6. Update `STATE.md` (current focus, next step — intent only; no counts/progress, see "STATE.md scope").
 
 ## Saving rule

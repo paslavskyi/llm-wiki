@@ -17,3 +17,9 @@ _none_
 
 ### Orphan notes (no links in or out)
 _none_
+
+### Accepted claims without evidence
+_none_
+
+### Unused sources
+_none_

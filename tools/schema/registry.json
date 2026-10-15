@@ -5,5 +5,6 @@
   "goal": "goal.json",
   "plan": "plan.json",
   "milestone": "milestone.json",
-  "timeline": "timeline.json"
+  "timeline": "timeline.json",
+  "source": "source.json"
 }

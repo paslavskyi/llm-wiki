@@ -15,6 +15,14 @@ Before writing, use the `kb-recall` skill to check whether this concept already 
 If the update would ripple to other notes (their meaning depends on this change),
 stop and hand off to `kb-evolve`.
 
+### Evidence check (provenance)
+When the knowledge comes FROM something — an interview, a document, a URL, survey
+or analytics data, research you ran, or the owner's first-hand account — capture
+that origin as a `source` note (`SRC-`, folder `sources`, `kind` + `origin`; body =
+the verbatim quote/excerpt, never a paraphrase) and cite it from the claim note via
+`sources: [SRC-…]`. Numbers, dates and quotes in the claim must match the source
+exactly. Reuse an existing SRC- note when the same source backs several claims.
+
 ### Recurring-concern check (avoid duplicating a thought across note bodies)
 `resolve` above catches duplicate NOTES. This catches a duplicate THOUGHT — the
 same risk / assumption / trade-off / caveat re-stated inside the bodies of several

@@ -6,6 +6,7 @@ import { buildTree } from '../lib/mindmap.mjs';
 import { jaroWinkler, normalizeForCompare } from '../lib/jaro-winkler.mjs';
 import { loadConfig } from '../lib/config.mjs';
 import { OPEN_TYPES, isOpenNote } from '../lib/open.mjs';
+import { EVIDENCE_TYPES } from '../lib/vocabulary.mjs';
 
 const BANNER = '<!-- GENERATED — do not edit by hand. Run: node tools/graph.mjs -->';
 
@@ -60,7 +61,17 @@ export async function buildHealth(rootDir, opts = {}) {
     return !hasOut && !hasIn;
   }).map(n => n.frontmatter.id).sort();
 
-  // Tier 2.2 possible duplicates (opt-in)
+  // Tier 2.2 provenance: accepted claims with no evidence; sources nothing cites
+  const unsupported = notes
+    .filter(n => EVIDENCE_TYPES.has(n.frontmatter.type) && n.frontmatter.status === 'accepted'
+      && !(n.frontmatter.sources ?? []).length)
+    .map(n => n.frontmatter.id).sort();
+  const unusedSources = notes
+    .filter(n => n.frontmatter.type === 'source' && n.frontmatter.status !== 'deprecated'
+      && !(backlinks.get(n.frontmatter.id) ?? []).length)
+    .map(n => n.frontmatter.id).sort();
+
+  // Tier 2.3 possible duplicates (opt-in)
   const dupes = [];
   if (opts.duplicates) {
     const threshold = opts.threshold ?? 0.92;
@@ -99,6 +110,10 @@ export async function buildHealth(rootDir, opts = {}) {
   md += `\n## Tier 2 — may need attention (heuristic)\n\n`;
   md += `### Orphan notes (no links in or out)\n`;
   md += orphans.length ? orphans.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
+  md += `\n### Accepted claims without evidence\n`;
+  md += unsupported.length ? unsupported.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
+  md += `\n### Unused sources\n`;
+  md += unusedSources.length ? unusedSources.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
   if (opts.duplicates) {
     md += `\n### Possible duplicates (Jaro-Winkler ≥ ${opts.threshold ?? 0.92})\n`;
     md += dupes.length ? dupes.map(d => `- ${d.a} ~ ${d.b} (${d.score})`).join('\n') + '\n' : '_none_\n';

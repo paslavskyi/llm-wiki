@@ -50,6 +50,13 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 | gtm | positioning, channel, pricing, message | POS-, CHAN-, PRICE-, MSG- |
 | cross-cutting | risk, assumption, question | RISK-, ASMP-, Q- |
 | decisions | decision | DEC- |
+| sources | source | SRC- |
+
+A `source` note (`SRC-`, required `kind`: interview | conversation | document | url |
+research | survey | analytics | observation; optional `origin`) is evidence: its body
+keeps the verbatim quote/excerpt. Any note cites evidence via `sources: [SRC-…]`.
+Accepted persona/segment/jtbd/pain/competitor/market-insight notes with no
+`sources`, and sources nothing cites, are flagged in `index/health.md`.
 
 `topic` and the cross-cutting types live in any domain folder; every other type
 lives only in its own domain folder.
