@@ -13,6 +13,7 @@
     "links": { "type": "array", "items": { "type": "string" } },
     "topic": { "type": "string", "pattern": "^TOP-[0-9]+$" },
     "sources": { "type": "array", "items": { "type": "string" } },
+    "relations": { "type": "object" },
     "created": { "type": "string" },
     "updated": { "type": "string" },
     "superseded_by": { "type": ["string", "null"] }

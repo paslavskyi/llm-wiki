@@ -5,6 +5,7 @@ import { walkMarkdown } from '../lib/walk.mjs';
 import { readNote } from '../lib/note.mjs';
 import { domainOf } from '../lib/domain.mjs';
 import { buildTree } from '../lib/mindmap.mjs';
+import { relationEdges } from '../lib/relations.mjs';
 
 const BANNER = '<!-- GENERATED — do not edit by hand. Run: npm run reindex -->';
 
@@ -79,6 +80,9 @@ export async function buildIndexes(rootDir) {
   const ordered = {};
   for (const k of Object.keys(backlinks).sort()) ordered[k] = backlinks[k];
   files['index/backlinks.json'] = JSON.stringify(ordered, null, 2) + '\n';
+
+  // relations.json — typed edges with derived inverses
+  files['index/relations.json'] = JSON.stringify(relationEdges(notes), null, 2) + '\n';
 
   // mindmap.md — nested tree from topic graph
   const { roots, unassigned } = buildTree(notes);

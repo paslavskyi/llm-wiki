@@ -55,6 +55,22 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 | decisions | decision | DEC- |
 | sources | source | SRC- |
 
+Typed relations (`lib/relations.mjs`): `relations: { <name>: [ids] }`, declared once
+on the owning note; the inverse is derived into `index/relations.json`. Allowed
+pairs are enforced:
+| relation | from | to | inverse |
+|---|---|---|---|
+| refines | feature/requirement/nfr/story | feature/requirement/nfr/jtbd/goal | refined_by |
+| addresses | feature/requirement/nfr/story/value-prop/decision | pain/jtbd | addressed_by |
+| serves | feature/requirement/nfr/story/value-prop/positioning/message/channel/pricing | persona/segment | served_by |
+| mitigates | feature/requirement/nfr/story/decision/milestone | risk | mitigated_by |
+| measures | kpi | goal/milestone/vision/value-prop/feature/requirement/nfr/story | measured_by |
+| answers | any | question | answered_by |
+| depends_on | any | any | required_by |
+| conflicts_with | any | any | conflicts_with |
+
+Use `links:` only for a plain "see also" that no relation describes.
+
 A `source` note (`SRC-`, required `kind`: interview | conversation | document | url |
 research | survey | analytics | observation; optional `origin`) is evidence: its body
 keeps the verbatim quote/excerpt. Any note cites evidence via `sources: [SRC-…]`.
@@ -123,7 +139,8 @@ its body; the live note states the current verdict.
 
 ## Folder map
 - `knowledge/<domain>/...` — source notes
-- `index/` — generated (MAP, per-domain indexes, backlinks.json)
+- `index/` — generated (MAP, per-domain indexes, backlinks.json, relations.json,
+  health.md)
 - `tools/` — Node CLIs: write pipeline (`write-note.mjs`, `kb-write.mjs`),
   `validate.mjs`, `reindex.mjs`, `graph.mjs`, `impact.mjs`, `plan.mjs`,
   `mindmap-html.mjs`, `dashboard/`, hooks (`user-prompt-hook.mjs`,

@@ -10,7 +10,9 @@ Goal: capture exactly one concept correctly, without creating duplicates.
 ## Step 1 — RESOLVE (always first)
 Before writing, use the `kb-recall` skill to check whether this concept already exists:
 - Same concept already noted → **update** that note.
-- Related but distinct → **create** a new note and add a `links` entry to the related one.
+- Related but distinct → **create** a new note and connect it: a typed relation
+  (`relations: {mitigates|refines|addresses|serves|measures|answers|depends_on|conflicts_with: [ids]}`,
+  allowed pairs in CLAUDE.md) when one fits, otherwise a plain `links` entry.
 - Nothing found → **create** a new note.
 If the update would ripple to other notes (their meaning depends on this change),
 stop and hand off to `kb-evolve`.

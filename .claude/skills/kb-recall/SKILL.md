@@ -14,8 +14,10 @@ Goal: find the relevant notes for a question while reading as little as possible
 3. Open only the shortlisted note files.
 4. Follow `links` (and `index/backlinks.json` for reverse links) to pull in
    directly related notes — one hop unless the question needs more. Backlinks
-   cover all reference fields (goal `scope`, plan lists, timeline `sequence`),
-   so "which goal/plan mentions X" is answered by backlinks.json too.
+   cover all reference fields (goal `scope`, plan lists, timeline `sequence`,
+   `sources`, `relations`), so "which goal/plan mentions X" is answered by
+   backlinks.json too. For MEANING ("what mitigates RISK-003?", "who does
+   FEAT-002 serve?") read `index/relations.json` — typed edges with inverses.
 5. Report findings:
    - `debug`: list the ids you read and their statuses.
    - `autonomous`: summarize what's already known in plain language, no ids.

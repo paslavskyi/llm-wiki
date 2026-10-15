@@ -7,6 +7,7 @@ import { loadValidators } from '../lib/schemas.mjs';
 import { findDuplicateTopLevelKeys } from '../lib/frontmatter-keys.mjs';
 import { checkVocabulary } from '../lib/vocabulary.mjs';
 import { checkMarkers } from '../lib/markers.mjs';
+import { checkRelations } from '../lib/relations.mjs';
 import { domainOf } from '../lib/domain.mjs';
 
 // STATE.md is intent-only (see CLAUDE.md → "STATE.md scope"): it must never hold
@@ -133,6 +134,7 @@ export async function validateNotes(rootDir) {
         errors.push(`${who}: parent → ${parent} must point to a topic note`);
       }
     }
+    for (const e of checkRelations(fm, typeById)) errors.push(`${who}: ${e}`);
     for (const s of Array.isArray(fm.sources) ? fm.sources : []) {
       if (ids.has(s) && typeById.get(s) !== 'source') {
         errors.push(`${who}: sources → ${s} must point to a source note`);

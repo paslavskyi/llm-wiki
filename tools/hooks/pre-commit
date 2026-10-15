@@ -8,7 +8,7 @@ node tools/validate.mjs
 
 echo "[pre-commit] regenerating indexes..."
 node tools/reindex.mjs
-git add index/MAP.md index/backlinks.json index/mindmap.md 2>/dev/null || true
+git add index/MAP.md index/backlinks.json index/relations.json index/mindmap.md 2>/dev/null || true
 git add index/*.index.md 2>/dev/null || true
 
 echo "[pre-commit] regenerating health report..."
