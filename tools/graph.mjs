@@ -10,6 +10,7 @@ import { EVIDENCE_TYPES } from '../lib/vocabulary.mjs';
 import { findMarkers } from '../lib/markers.mjs';
 import { computeCoverage } from '../lib/coverage.mjs';
 import { criterionForm, isVague } from '../lib/acceptance.mjs';
+import { decisionSections, RECOMMENDED_SECTIONS } from '../lib/decision.mjs';
 
 const BANNER = '<!-- GENERATED — do not edit by hand. Run: node tools/graph.mjs -->';
 
@@ -96,7 +97,21 @@ export async function buildHealth(rootDir, opts = {}) {
       .map(n => n.frontmatter.id),
   ].sort();
 
-  // Tier 2.4 possible duplicates (opt-in)
+  // Tier 1.5 / 2.4 decisions: revisit date reached; MADR recommended sections
+  const today = opts.today ?? new Date().toISOString().slice(0, 10);
+  const decisions = live.filter(n => n.frontmatter.type === 'decision' && n.frontmatter.id);
+  const dueDecisions = decisions
+    .filter(n => typeof n.frontmatter.revisit === 'string' && n.frontmatter.revisit <= today)
+    .map(n => `${n.frontmatter.id} (revisit ${n.frontmatter.revisit})`).sort();
+  const thinDecisions = decisions
+    .map(n => {
+      const have = decisionSections(n.body);
+      return { id: n.frontmatter.id, missing: RECOMMENDED_SECTIONS.filter(s => !have.includes(s)) };
+    })
+    .filter(d => d.missing.length)
+    .map(d => `${d.id} — ${d.missing.join(', ')}`).sort();
+
+  // Tier 2.5 possible duplicates (opt-in)
   const dupes = [];
   if (opts.duplicates) {
     const threshold = opts.threshold ?? 0.92;
@@ -130,6 +145,8 @@ export async function buildHealth(rootDir, opts = {}) {
   md += debt.length ? debt.map(d => `- ${d.deprecated} ← ${d.from.join(', ')}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Open questions / risks / assumptions\n`;
   md += open.length ? open.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
+  md += `\n### Decisions due for review\n`;
+  md += dueDecisions.length ? dueDecisions.map(d => `- ${d}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Unresolved markers (inline clarifications / assumptions)\n`;
   md += marked.length
     ? marked.map(m => `- ${m.id} — ${m.q} clarification, ${m.a} assumption`).join('\n') + '\n'
@@ -149,6 +166,8 @@ export async function buildHealth(rootDir, opts = {}) {
   md += informal.length ? informal.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Vague wording without a number\n`;
   md += vague.length ? vague.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
+  md += `\n### Decisions without Considered Options / Confirmation\n`;
+  md += thinDecisions.length ? thinDecisions.map(d => `- ${d}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Accepted claims without evidence\n`;
   md += unsupported.length ? unsupported.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Unused sources\n`;

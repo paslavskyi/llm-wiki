@@ -75,6 +75,14 @@ KB language. Pass plain strings; the pipeline numbers them `<ID>.<n>`. Make qual
 words measurable ("under 2 s at p95", not "fast"). Add `verify:` when the check
 isn't obvious.
 
+### Decision notes (DEC-, MADR)
+Frontmatter: `decided`, `deciders`, `consulted`, `informed`, optional `revisit`
+(when to re-check). Body, in this order:
+`## Context` (the problem and forces) → `## Considered Options` (each with
+pros/cons) → `## Decision` (the chosen option + why) → `## Consequences` (good and
+bad) → `## Confirmation` (how we'll know it still holds). Link what it decides via
+`relations` (e.g. `answers: [Q-…]`, `mitigates: [RISK-…]`).
+
 ### Uncertainty inside the note
 Never guess silently. Where a detail is unknown, write `[NEEDS CLARIFICATION: …]`;
 where you filled a gap with a guess, write `[ASSUMPTION: …]`. A note with markers

@@ -95,6 +95,14 @@ note per significant decision, each recording context, the decision, rationale,
 and consequences. A decision that was later changed records the supersession in
 its body; the live note states the current verdict.
 
+Decision notes follow MADR (`lib/decision.mjs`): optional frontmatter `decided`,
+`revisit` (YYYY-MM-DD), `deciders` / `consulted` / `informed` (name lists); body
+sections `## Context`, `## Considered Options`, `## Decision`, `## Consequences`,
+`## Confirmation` (uk: Контекст / Розглянуті варіанти / Рішення / Наслідки /
+Підтвердження). An `accepted` decision must have Context, Decision and
+Consequences (enforced); health flags missing Options/Confirmation and decisions
+whose `revisit` date has passed.
+
 ## Goals & operational plan
 - **`goal` (GOAL-)** — a thematic product goal: title + description + `scope`
   (ids of member notes). Progress is COMPUTED from scope statuses — never

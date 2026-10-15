@@ -10,6 +10,9 @@ _none_
 ### Open questions / risks / assumptions
 _none_
 
+### Decisions due for review
+_none_
+
 ### Unresolved markers (inline clarifications / assumptions)
 _none_
 
@@ -28,6 +31,9 @@ _none_
 _none_
 
 ### Vague wording without a number
+_none_
+
+### Decisions without Considered Options / Confirmation
 _none_
 
 ### Accepted claims without evidence
