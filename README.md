@@ -161,7 +161,13 @@ health:
 Я веду звіт `index/health.md` — він показує, де база «провисає»:
 - **відкриті питання / ризики / припущення** — над чим ще треба попрацювати;
 - **порожні розділи карти** — області, які заявили, але не наповнили;
-- **технічний борг** — посилання на застарілі нотатки, які варто оновити.
+- **технічний борг** — посилання на застарілі нотатки, які варто оновити;
+- **непевності в тексті** — позначки `[NEEDS CLARIFICATION: …]` / `[ASSUMPTION: …]`
+  (нотатку з ними не можна затвердити);
+- **знання без доказів** — затверджені персони/болі/конкуренти без джерела
+  (`SRC-` нотатки: інтерв'ю, документ, посилання);
+- **прогалини покриття** (`index/coverage.md`) — must-вимога без історії, біль без
+  рішення, ризик без пом'якшення тощо.
 
 Скажи **«покажи здоров'я бази»** — і я зведу це в кілька рядків «що робити далі».
 
@@ -348,7 +354,13 @@ health:
 I maintain an `index/health.md` report showing where the base is thin:
 - **open questions / risks / assumptions** — what still needs work;
 - **empty map sections** — areas declared but not filled;
-- **technical debt** — links to deprecated notes worth updating.
+- **technical debt** — links to deprecated notes worth updating;
+- **inline uncertainty** — `[NEEDS CLARIFICATION: …]` / `[ASSUMPTION: …]` markers
+  (a note with markers can't be accepted);
+- **claims without evidence** — accepted personas/pains/competitors with no
+  source (`SRC-` notes: interview, document, link);
+- **coverage gaps** (`index/coverage.md`) — a must-requirement with no story, a
+  pain nothing addresses, a risk nothing mitigates, etc.
 
 Say **"show the base health"** and I'll boil it down to a few "what's next" lines.
 

@@ -8,6 +8,7 @@ import { loadConfig } from '../lib/config.mjs';
 import { OPEN_TYPES, isOpenNote } from '../lib/open.mjs';
 import { EVIDENCE_TYPES } from '../lib/vocabulary.mjs';
 import { findMarkers } from '../lib/markers.mjs';
+import { computeCoverage } from '../lib/coverage.mjs';
 
 const BANNER = '<!-- GENERATED — do not edit by hand. Run: node tools/graph.mjs -->';
 
@@ -124,7 +125,13 @@ export async function buildHealth(rootDir, opts = {}) {
   md += `\n### Empty topic nodes (no attached notes)\n`;
   md += emptyTopics.length ? emptyTopics.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
   md += `\n## Tier 2 — may need attention (heuristic)\n\n`;
-  md += `### Orphan notes (no links in or out)\n`;
+  const coverage = computeCoverage(notes).filter(r => r.gaps.length);
+  const gapCount = coverage.reduce((s, r) => s + r.gaps.length, 0);
+  md += `### Coverage gaps\n`;
+  md += gapCount
+    ? `- ${gapCount} gap(s) across ${coverage.length} rule(s) — see index/coverage.md\n`
+    : '_none_\n';
+  md += `\n### Orphan notes (no links in or out)\n`;
   md += orphans.length ? orphans.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Accepted claims without evidence\n`;
   md += unsupported.length ? unsupported.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';

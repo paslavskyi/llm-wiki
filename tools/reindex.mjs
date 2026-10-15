@@ -6,6 +6,7 @@ import { readNote } from '../lib/note.mjs';
 import { domainOf } from '../lib/domain.mjs';
 import { buildTree } from '../lib/mindmap.mjs';
 import { relationEdges } from '../lib/relations.mjs';
+import { computeCoverage } from '../lib/coverage.mjs';
 
 const BANNER = '<!-- GENERATED — do not edit by hand. Run: npm run reindex -->';
 
@@ -83,6 +84,19 @@ export async function buildIndexes(rootDir) {
 
   // relations.json — typed edges with derived inverses
   files['index/relations.json'] = JSON.stringify(relationEdges(notes), null, 2) + '\n';
+
+  // coverage.md — expected connections per rule (lib/coverage.mjs)
+  const coverage = computeCoverage(notes);
+  let cov = `${BANNER}\n\n# Coverage\n\n`;
+  cov += `| Rule | Covered | % |\n|---|---|---|\n`;
+  for (const r of coverage) {
+    const pct = r.applicable ? `${Math.round((100 * r.covered) / r.applicable)}%` : '—';
+    cov += `| ${cell(r.label)} | ${r.covered}/${r.applicable} | ${pct} |\n`;
+  }
+  for (const r of coverage.filter(c => c.gaps.length)) {
+    cov += `\n## ${r.label}\n\n` + r.gaps.map(id => `- ${id}`).join('\n') + '\n';
+  }
+  files['index/coverage.md'] = cov;
 
   // mindmap.md — nested tree from topic graph
   const { roots, unassigned } = buildTree(notes);

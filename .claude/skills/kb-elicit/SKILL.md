@@ -57,6 +57,8 @@ Compose, do not maintain a separate drifting artifact:
 2. Open `Q-` / `ASMP-` / `RISK-` notes and "Unresolved markers" in
    `index/health.md` — known gaps.
 3. Topic nodes with no attached notes — from `index/mindmap.md`.
+4. Coverage gaps — from `index/coverage.md` (e.g. a must-requirement no story
+   delivers, a pain nothing addresses, a risk nothing mitigates).
 
 ## Output (per mode)
 - `debug`: state which notes you created/updated, their ids, and the agenda.

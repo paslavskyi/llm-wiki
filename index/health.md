@@ -18,6 +18,9 @@ _none_
 
 ## Tier 2 — may need attention (heuristic)
 
+### Coverage gaps
+_none_
+
 ### Orphan notes (no links in or out)
 _none_
 
