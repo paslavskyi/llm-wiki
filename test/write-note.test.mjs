@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
 import { readFile, readdir, writeFile } from 'node:fs/promises';
-import { writeNote, buildSupersededIndex, targetPathFor } from '../tools/write-note.mjs';
+import { writeNote, buildSupersededIndex, targetPathFor, nextId } from '../tools/write-note.mjs';
 import { validateNotes } from '../tools/validate.mjs';
 import { readNote } from '../lib/note.mjs';
 import { assertNoDuplicateFrontmatterKeys, findDuplicateTopLevelKeys } from '../lib/frontmatter-keys.mjs';
@@ -181,5 +181,39 @@ test('round-trip: written dates are plain YYYY-MM-DD strings', async () => {
     assert.equal(note.frontmatter.created, '2026-05-30');
     assert.equal(note.frontmatter.updated, '2026-05-30');
     assert.equal(typeof note.frontmatter.created, 'string');
+  } finally { await cleanup(dir); }
+});
+
+test('nextId: first id of a prefix is 001', async () => {
+  const dir = await makeTmpDir();
+  try {
+    assert.equal(await nextId(dir, 'persona'), 'PER-001');
+  } finally { await cleanup(dir); }
+});
+
+test('nextId: max existing number + 1, counting deprecated notes and any folder', async () => {
+  const dir = await makeTmpDir();
+  try {
+    await writeFileDeep(join(dir, 'knowledge/product/requirements/FR-002-a.md'), '# x');
+    await writeFileDeep(join(dir, 'knowledge/product/FR-010-old.md'), '# x');
+    await writeFileDeep(join(dir, 'knowledge/product/NFR-050-n.md'), '# x');
+    assert.equal(await nextId(dir, 'requirement'), 'FR-011');
+    assert.equal(await nextId(dir, 'nfr'), 'NFR-051');
+  } finally { await cleanup(dir); }
+});
+
+test('nextId: unknown type throws', async () => {
+  const dir = await makeTmpDir();
+  try {
+    await assert.rejects(nextId(dir, 'banana'), /unknown type "banana"/);
+  } finally { await cleanup(dir); }
+});
+
+test('writeNote rejects a note written outside its type\'s domain', async () => {
+  const dir = await makeTmpDir();
+  try {
+    const target = join(dir, 'knowledge/users/FR-007-create-budget.md');
+    await assert.rejects(writeNote(dir, target, intent()), /belongs in knowledge\/product\//);
+    assert.deepEqual(await readdir(join(dir, 'knowledge/users')), []);
   } finally { await cleanup(dir); }
 });

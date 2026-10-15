@@ -36,21 +36,24 @@ Before writing a risk / assumption / trade-off / caveat into a note body, ask:
 
 ## Step 2 — IDENTIFY
 - Pick the `type` from the vocabulary in `CLAUDE.md`.
-- Choose the matching domain folder and ID prefix.
-- Assign the next free id: read `index/<domain>.index.md` (or scan the folder) and
-  take the highest existing number for that prefix, +1. Zero-pad to 3 digits
-  (e.g., `FR-007`).
+- Choose the matching domain folder (`topic` and `risk`/`assumption`/`question`
+  may sit in any domain; every other type has exactly one — `lib/vocabulary.mjs`).
+- For a NEW note, omit `id`: the write pipeline assigns the next free one for the
+  type's prefix (`npm run kb:write` prints it, e.g. `created FR-007`). For an
+  update, pass the existing id. Type, id prefix and folder are enforced — a
+  mismatch fails the write and `validate`.
 
 ## Step 3 — WRITE (through the write pipeline)
 - Filename target: `knowledge/<domain>/<ID>-<slug>.md` (slug = kebab of title; the
   write pipeline derives it).
-- Build the note "intent" (frontmatter required fields: `id, type, title, status,
-  summary` + `priority, category` for requirement/nfr; `parent` for topic; plus
+- Build the note "intent" (frontmatter required fields: `type, title, status,
+  summary` (+ `id` when updating) + `priority, category` for requirement/nfr; `parent` for topic; plus
   `links`, body). Status of a NEW note reflects how settled the knowledge is:
   `draft` = tentative/unconfirmed; `proposed` = awaiting the owner's verdict;
   `accepted` = the owner confirmed/decided it in this dialogue (approved
   decisions, goals, reached stages). Don't default to `draft` for owner-approved facts.
-- Write via the atomic write pipeline `tools/write-note.mjs` (NOT a raw Write):
+- Write via the atomic write pipeline — `npm run kb:write` (JSON on stdin, wraps
+  `tools/write-note.mjs`; NOT a raw Write):
   it reconstructs the note to a healthy state (rule_set: sets `updated`, preserves
   `created`, resolves any deprecated refs to live ids, dedupes links, removes
   self-refs, keeps unknown fields verbatim) and writes atomically.

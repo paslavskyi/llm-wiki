@@ -5,6 +5,8 @@ import { walkMarkdown } from '../lib/walk.mjs';
 import { readNote } from '../lib/note.mjs';
 import { loadValidators } from '../lib/schemas.mjs';
 import { findDuplicateTopLevelKeys } from '../lib/frontmatter-keys.mjs';
+import { checkVocabulary } from '../lib/vocabulary.mjs';
+import { domainOf } from '../lib/domain.mjs';
 
 // STATE.md is intent-only (see CLAUDE.md → "STATE.md scope"): it must never hold
 // derived facts that already live — fresh — in index/MAP.md + index/health.md. A
@@ -90,6 +92,8 @@ export async function validateNotes(rootDir) {
         .join('; ');
       errors.push(`${id}: schema error — ${detail}`);
     }
+
+    for (const e of checkVocabulary(fm, domainOf(note.filePath))) errors.push(`${id}: ${e}`);
 
     if (!note.fileName.startsWith(`${id}-`) && note.fileName !== `${id}.md`) {
       errors.push(`${id}: filename "${note.fileName}" must start with the id`);

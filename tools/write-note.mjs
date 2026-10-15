@@ -6,6 +6,8 @@ import { readNote } from '../lib/note.mjs';
 import { healNote, slugify } from '../lib/heal.mjs';
 import { loadValidators } from '../lib/schemas.mjs';
 import { assertNoDuplicateFrontmatterKeys } from '../lib/frontmatter-keys.mjs';
+import { VOCABULARY, checkVocabulary } from '../lib/vocabulary.mjs';
+import { domainOf } from '../lib/domain.mjs';
 
 function todayISO(ctxToday) {
   // today must be injected (Date.now is unavailable in some contexts); fall back.
@@ -24,6 +26,22 @@ export async function buildSupersededIndex(rootDir) {
     }
   }
   return idx;
+}
+
+// nextId: the next free id for a type — highest number on disk for its primary
+// prefix + 1, zero-padded to 3. Scans every file (deprecated notes included), so
+// an id is never reused.
+export async function nextId(rootDir, type) {
+  const entry = VOCABULARY[type];
+  if (!entry) throw new Error(`nextId: unknown type "${type}"`);
+  const prefix = entry.prefixes[0];
+  const re = new RegExp(`^${prefix}-(\\d+)(?:-|\\.md$)`);
+  let max = 0;
+  for (const fp of await walkMarkdown(join(rootDir, 'knowledge'))) {
+    const m = basename(fp).match(re);
+    if (m) max = Math.max(max, Number(m[1]));
+  }
+  return `${prefix}-${String(max + 1).padStart(3, '0')}`;
 }
 
 async function exists(p) {
@@ -81,9 +99,11 @@ export async function writeNote(rootDir, targetPath, intent, opts = {}) {
     const { validatorFor } = await loadValidators();
     const reparsed = matter(await readFile(tmp, 'utf8'));
     const validate = validatorFor(reparsed.data.type);
-    if (!validate(reparsed.data)) {
-      const detail = (validate.errors ?? []).map(e => `${e.instancePath || '/'} ${e.message}`).join('; ');
-      throw new Error(`write-note: local validation failed for ${healed.frontmatter.id} — ${detail}`);
+    const problems = validate(reparsed.data)
+      ? [] : (validate.errors ?? []).map(e => `${e.instancePath || '/'} ${e.message}`);
+    problems.push(...checkVocabulary(reparsed.data, domainOf(targetPath)));
+    if (problems.length) {
+      throw new Error(`write-note: local validation failed for ${healed.frontmatter.id} — ${problems.join('; ')}`);
     }
   } catch (e) {
     await unlink(tmp).catch(() => {});

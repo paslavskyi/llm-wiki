@@ -27,6 +27,9 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 - Never read the whole knowledge base — navigate index-first (MAP → domain index → note).
 - Every note has a stable `id`; once assigned, an id is never reused or deleted.
 - A note's filename must start with its `id` (e.g., `FR-001-budget.md`).
+- A note's `type`, id prefix and domain folder must agree with the vocabulary
+  below (data: `lib/vocabulary.mjs`; enforced by `validate` and the write
+  pipeline). New ids are assigned by the pipeline, never picked by hand.
 - Capture knowledge only via `kb-capture`; do not hand-write notes ad hoc.
 - All note writes go through the write pipeline (`tools/write-note.mjs` via
   `kb-capture`/`kb-evolve`); never raw-write or hand-edit notes. Every write
@@ -47,6 +50,9 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
 | gtm | positioning, channel, pricing, message | POS-, CHAN-, PRICE-, MSG- |
 | cross-cutting | risk, assumption, question | RISK-, ASMP-, Q- |
 | decisions | decision | DEC- |
+
+`topic` and the cross-cutting types live in any domain folder; every other type
+lives only in its own domain folder.
 
 `requirement` priority values: `must | should | could | wont`.
 
@@ -115,7 +121,8 @@ its body; the live note states the current verdict.
 ## Tooling
 - `npm run kb:write` — batch-write notes through the heal/validate pipeline.
   JSON on stdin: `[{domainDir, frontmatter, body}]` (body = string or string[] of
-  lines). For coherent multi-note writes/updates; a single note still goes via
+  lines). Omit `frontmatter.id` for a new note — the next free id for the
+  type is assigned and printed. For coherent multi-note writes/updates; a single note still goes via
   `kb-capture`. Avoids ad-hoc temp scripts and JS-string escaping pitfalls.
 - `npm run validate` — validate all notes (also runs automatically after writes).
 - `npm run reindex` — regenerate `index/` (also runs automatically at end of turn).

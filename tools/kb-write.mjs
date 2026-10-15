@@ -3,8 +3,8 @@
 // Reads JSON from stdin: a single note object or an array of them. Each note:
 //   {
 //     "domainDir":   "product/domain",        // path under knowledge/
-//     "frontmatter": { "id": "...", "type": "...", "title": "...",
-//                      "status": "...", "summary": "...", ... },
+//     "frontmatter": { "id": "...", "type": "...", "title": "...",   // omit "id" for a NEW note:
+//                      "status": "...", "summary": "...", ... },   // the pipeline assigns the next free one
 //     "body":        "markdown string"  OR  ["line 1", "line 2", ...]
 //   }
 // (alias: "fm" may be used instead of "frontmatter"; body lines are joined "\n".)
@@ -20,7 +20,7 @@
 // deterministic pass. JSON input avoids the JS-string apostrophe footgun.
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
-import { writeNote, targetPathFor } from './write-note.mjs';
+import { writeNote, targetPathFor, nextId } from './write-note.mjs';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 
@@ -41,8 +41,8 @@ async function readStdin() {
 function normalize(note) {
   const fm = note.frontmatter ?? note.fm;
   if (!note.domainDir) throw new Error('note missing "domainDir"');
-  if (!fm || !fm.id || !fm.type || !fm.title) {
-    throw new Error(`note missing frontmatter id/type/title (got id=${fm?.id})`);
+  if (!fm || !fm.type || !fm.title) {
+    throw new Error(`note missing frontmatter type/title (got id=${fm?.id})`);
   }
   const body = Array.isArray(note.body) ? note.body.join('\n') : (note.body ?? '');
   return { domainDir: note.domainDir, fm, body };
@@ -68,6 +68,11 @@ for (const n of notes) {
   let note;
   try {
     note = normalize(n);
+  } catch (e) {
+    fail++; console.error(`✗ ${e.message}`); continue;
+  }
+  try {
+    if (!note.fm.id) note.fm.id = await nextId(ROOT, note.fm.type);
   } catch (e) {
     fail++; console.error(`✗ ${e.message}`); continue;
   }
