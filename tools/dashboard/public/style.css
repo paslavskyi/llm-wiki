@@ -1,4 +1,4 @@
-/* Altus product dashboard — warm-dark theme; palette per dataviz reference (validated). */
+/* KB product dashboard — warm-dark theme; palette per dataviz reference (validated). */
 :root {
   --page:        #0d0d0d;
   --surface:     #1a1a19;
@@ -275,3 +275,10 @@ footer { margin-top: 24px; font-size: 12.5px; text-align: center; }
 @media (prefers-reduced-motion: no-preference) {
   #app main { transition: opacity 0.2s ease; }
 }
+
+/* saved queries (KB tab) */
+details.query { border-top: 1px solid var(--grid); padding: 8px 0; }
+details.query:first-child { border-top: 0; }
+details.query > summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+details.query > summary .nsum { flex-basis: 100%; }
+details.query .notelist { margin-top: 6px; }

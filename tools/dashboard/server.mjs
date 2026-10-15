@@ -2,12 +2,14 @@
 // Serves the hand-written SPA in public/ and a GET-only JSON API computed
 // live from note frontmatter + git history. Never writes to the KB.
 import { createServer } from 'node:http';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { join, dirname, extname, resolve, sep, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { loadNotes as loadRawNotes } from '../../lib/load-notes.mjs';
+import { runQuery, checkQuery } from '../../lib/query.mjs';
+import yaml from 'js-yaml';
 import { domainOf } from '../../lib/domain.mjs';
 import { loadPlanHistory } from '../../lib/plan-history.mjs';
 import { buildTree } from '../../lib/mindmap.mjs';
@@ -85,6 +87,28 @@ async function gitActivity() {
   }
 }
 
+// Saved queries (queries/*.yml) — parameterless ones run now; parameterised ones
+// are listed so the owner knows to ask for them in dialogue.
+async function buildQueries() {
+  let files = [];
+  try { files = (await readdir(join(ROOT, 'queries'))).filter(f => f.endsWith('.yml')).sort(); } catch { return []; }
+  const raw = await loadRawNotes(ROOT);
+  const out = [];
+  for (const f of files) {
+    let spec;
+    try { spec = yaml.load(await readFile(join(ROOT, 'queries', f), 'utf8')); } catch { continue; }
+    const name = f.replace(/\.yml$/, '');
+    const needsParam = JSON.stringify(spec?.where ?? []).includes('$param');
+    if (needsParam || checkQuery(spec).length) {
+      out.push({ name, title: spec?.title ?? name, description: spec?.description ?? '', needsParam, count: null, rows: [] });
+      continue;
+    }
+    const rows = runQuery({ ...spec, show: ['id', 'title', 'status', 'summary'], limit: spec.limit ?? 50 }, raw);
+    out.push({ name, title: spec.title, description: spec.description ?? '', needsParam: false, count: rows.length, rows });
+  }
+  return out;
+}
+
 async function loadNotes() {
   const raw = await loadRawNotes(ROOT);
   return raw.map(n => ({ ...pick(n), filePath: n.filePath, body: n.body }));
@@ -139,6 +163,7 @@ async function buildDashboard() {
   return {
     generatedAt: new Date().toISOString(),
     repo: basename(ROOT),
+    queries: await buildQueries(),
     git: gitMeta,
     state,
     totals: {
@@ -229,7 +254,7 @@ async function buildMindmap() {
     });
   }
   return {
-    name: 'Altus KB', noteId: null, kind: 'root',
+    name: basename(ROOT), noteId: null, kind: 'root',
     value: children.reduce((s, c) => s + c.value, 0),
     children,
   };

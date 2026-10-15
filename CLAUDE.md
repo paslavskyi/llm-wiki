@@ -81,6 +81,8 @@ independent.
   body}]`; prints assigned ids).
 - `npm run validate` · `npm run reindex` · `npm run graph` — also run by hooks
   (PostToolUse / Stop / pre-commit; `npm run install-hooks` installs the latter).
+- `npm run query -- <name> [--param X]` — saved frontmatter queries (`queries/*.yml`,
+  format in `lib/query.mjs`); `--list` shows them.
 - `npm run clarify` · `npm run impact -- <ID>` · `npm run plan -- <verb>` ·
   `npm run dashboard` (http://localhost:4321, read-only) · `npm test`.
 - `lib/` pure modules, `tools/` CLIs + schemas, `test/` suite; `docs/superpowers/`

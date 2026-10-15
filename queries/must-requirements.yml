@@ -1,0 +1,7 @@
+title: Must-have requirements
+description: Every live must requirement / NFR, least settled first.
+from: [requirement, nfr]
+where:
+  - priority: must
+sort: status
+show: [id, title, status, category]

@@ -1,0 +1,7 @@
+title: Assumptions not yet validated
+description: Assumptions reality hasn't confirmed or refuted — candidates for research.
+from: [assumption]
+where:
+  - validation: { in: [open, null] }
+sort: -updated
+show: [id, title, status, validation]

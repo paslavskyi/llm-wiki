@@ -1,0 +1,7 @@
+title: What serves a persona
+description: "Features / requirements / stories that serve (or reference) a persona. Usage: npm run query -- serving-persona --param PER-001"
+from: [feature, requirement, nfr, story, value-prop]
+where:
+  - refs: $param
+sort: type
+show: [id, type, title, status]

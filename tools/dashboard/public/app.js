@@ -1,4 +1,4 @@
-// Altus product dashboard client — renders /api/dashboard + /api/note/:id.
+// KB dashboard client — renders /api/dashboard + /api/note/:id.
 // Read-only viewer: plan changes happen in dialogue (kb-plan).
 'use strict';
 
@@ -334,6 +334,17 @@ function renderHealth(d) {
     { badge: false, emptyText: 'все чисто' });
 }
 
+function renderQueries(d) {
+  const qs = d.queries ?? [];
+  $('query-list').innerHTML = qs.length ? qs.map(q => `
+    <details class="query">
+      <summary><b>${esc(q.title)}</b> <span class="nmeta">${q.needsParam ? 'з параметром — запитай у діалозі' : esc(String(q.count))}</span>
+        <span class="nsum">${esc(q.description)} · <code class="mono">npm run query -- ${esc(q.name)}${q.needsParam ? ' --param …' : ''}</code></span></summary>
+      <ul class="notelist">${q.rows.length ? q.rows.map(r => noteLi(r)).join('') : '<li class="empty">порожньо</li>'}</ul>
+    </details>`).join('')
+    : '<p class="empty">Немає збережених запитів (queries/*.yml)</p>';
+}
+
 function chart(elId, option) {
   const el = $(elId);
   let c = state.charts[elId];
@@ -440,7 +451,7 @@ function renderAll() {
   renderHeader(d); renderHero(d);
   renderTimeline(d); renderGoals(d); renderVision(d); renderKpi(d); renderMilestones(d);
   renderDelivery(d); renderDebt(d); renderLiveTail(d);
-  renderTiles(d); renderHealth(d); renderDomainChart(d); renderPulseChart(d); renderRecent(d);
+  renderTiles(d); renderHealth(d); renderQueries(d); renderDomainChart(d); renderPulseChart(d); renderRecent(d);
   $('app').classList.remove('loading');
   $('app').removeAttribute('aria-busy');
 }

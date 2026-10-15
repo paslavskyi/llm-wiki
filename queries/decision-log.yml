@@ -1,0 +1,7 @@
+title: Decision log
+description: Accepted decisions, newest first, with their review date.
+from: [decision]
+where:
+  - status: accepted
+sort: -decided
+show: [id, title, decided, revisit]
