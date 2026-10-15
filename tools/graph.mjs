@@ -7,6 +7,7 @@ import { jaroWinkler, normalizeForCompare } from '../lib/jaro-winkler.mjs';
 import { loadConfig } from '../lib/config.mjs';
 import { OPEN_TYPES, isOpenNote } from '../lib/open.mjs';
 import { EVIDENCE_TYPES } from '../lib/vocabulary.mjs';
+import { findMarkers } from '../lib/markers.mjs';
 
 const BANNER = '<!-- GENERATED — do not edit by hand. Run: node tools/graph.mjs -->';
 
@@ -49,6 +50,17 @@ export async function buildHealth(rootDir, opts = {}) {
   };
   roots.forEach(walkTopic);
   emptyTopics.sort();
+
+  // Tier 1.4 unresolved inline markers ([NEEDS CLARIFICATION] / [ASSUMPTION])
+  const marked = notes
+    .filter(n => n.frontmatter.id && n.frontmatter.status !== 'deprecated')
+    .map(n => {
+      const ms = findMarkers(n.body);
+      const q = ms.filter(m => m.kind === 'NEEDS CLARIFICATION').length;
+      return { id: n.frontmatter.id, q, a: ms.length - q };
+    })
+    .filter(m => m.q + m.a > 0)
+    .sort((x, y) => x.id.localeCompare(y.id));
 
   // Tier 2.1 orphans: concrete notes with no links and no backlinks.
   // Exclude topics (structural) and open-type notes (question/risk/assumption are
@@ -105,6 +117,10 @@ export async function buildHealth(rootDir, opts = {}) {
   md += debt.length ? debt.map(d => `- ${d.deprecated} ← ${d.from.join(', ')}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Open questions / risks / assumptions\n`;
   md += open.length ? open.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
+  md += `\n### Unresolved markers (inline clarifications / assumptions)\n`;
+  md += marked.length
+    ? marked.map(m => `- ${m.id} — ${m.q} clarification, ${m.a} assumption`).join('\n') + '\n'
+    : '_none_\n';
   md += `\n### Empty topic nodes (no attached notes)\n`;
   md += emptyTopics.length ? emptyTopics.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
   md += `\n## Tier 2 — may need attention (heuristic)\n\n`;

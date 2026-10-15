@@ -32,8 +32,11 @@ saving each note only once it is a logically consistent, complete thought.
 3. Fill each sub-aspect: converse, asking clarifying questions, UNTIL the note is
    logically consistent (a complete, coherent thought). Only then save it via
    `kb-capture` with `topic: <node>`.
-4. Anything unresolved becomes a note, not a dropped thread: open question -> `Q-`,
-   assumption -> `ASMP-`, risk -> `RISK-`, attached to the same node.
+4. Anything unresolved is recorded, not dropped. A gap local to ONE note stays
+   inline in that note: `[NEEDS CLARIFICATION: …]` / `[ASSUMPTION: …]` (the note
+   remains `draft`/`proposed`). A gap that spans notes or needs its own decision
+   becomes a note: open question -> `Q-`, assumption -> `ASMP-`, risk -> `RISK-`,
+   attached to the same node.
 5. On request, propose options or research (web/evidence) and fold conclusions
    back into notes — every external finding becomes a `source` note (SRC-) cited
    via `sources:` (see kb-capture → Evidence check).
@@ -51,7 +54,8 @@ thought in multiple bodies (see kb-capture "Recurring-concern check").
 ## Coverage / agenda (what to work on next)
 Compose, do not maintain a separate drifting artifact:
 1. Empty areas — from `index/MAP.md` (count 0).
-2. Open `Q-` / `ASMP-` / `RISK-` notes — known gaps.
+2. Open `Q-` / `ASMP-` / `RISK-` notes and "Unresolved markers" in
+   `index/health.md` — known gaps.
 3. Topic nodes with no attached notes — from `index/mindmap.md`.
 
 ## Output (per mode)

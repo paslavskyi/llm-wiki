@@ -7,6 +7,7 @@ import { healNote, slugify } from '../lib/heal.mjs';
 import { loadValidators } from '../lib/schemas.mjs';
 import { assertNoDuplicateFrontmatterKeys } from '../lib/frontmatter-keys.mjs';
 import { VOCABULARY, checkVocabulary } from '../lib/vocabulary.mjs';
+import { checkMarkers } from '../lib/markers.mjs';
 import { domainOf } from '../lib/domain.mjs';
 
 function todayISO(ctxToday) {
@@ -102,6 +103,7 @@ export async function writeNote(rootDir, targetPath, intent, opts = {}) {
     const problems = validate(reparsed.data)
       ? [] : (validate.errors ?? []).map(e => `${e.instancePath || '/'} ${e.message}`);
     problems.push(...checkVocabulary(reparsed.data, domainOf(targetPath)));
+    problems.push(...checkMarkers(reparsed.data, reparsed.content));
     if (problems.length) {
       throw new Error(`write-note: local validation failed for ${healed.frontmatter.id} — ${problems.join('; ')}`);
     }

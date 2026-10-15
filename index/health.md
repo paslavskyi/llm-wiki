@@ -10,6 +10,9 @@ _none_
 ### Open questions / risks / assumptions
 _none_
 
+### Unresolved markers (inline clarifications / assumptions)
+_none_
+
 ### Empty topic nodes (no attached notes)
 _none_
 

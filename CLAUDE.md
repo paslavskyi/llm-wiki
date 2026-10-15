@@ -24,6 +24,9 @@ and go-to-market can be built on top. The interface to this knowledge is an LLM.
   copy derived facts into it — note counts, per-domain progress, and open `Q-`/`RISK-`/`ASMP-` lists
   belong to the generated `index/MAP.md` + `index/health.md`. Reference them; don't duplicate (a copy
   has no invalidation and silently drifts). If STATE and an index disagree, the index wins.
+- Inline uncertainty markers `[NEEDS CLARIFICATION: …]` / `[ASSUMPTION: …]` keep a
+  local gap visible in the note body; a note cannot be `accepted` while any remain
+  (enforced; listed in `index/health.md`).
 - Never read the whole knowledge base — navigate index-first (MAP → domain index → note).
 - Every note has a stable `id`; once assigned, an id is never reused or deleted.
 - A note's filename must start with its `id` (e.g., `FR-001-budget.md`).

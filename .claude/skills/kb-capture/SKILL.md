@@ -66,6 +66,12 @@ Before writing a risk / assumption / trade-off / caveat into a note body, ask:
   self-refs, keeps unknown fields verbatim) and writes atomically.
 - Do NOT hand-edit `index/`.
 
+### Uncertainty inside the note
+Never guess silently. Where a detail is unknown, write `[NEEDS CLARIFICATION: …]`;
+where you filled a gap with a guess, write `[ASSUMPTION: …]`. A note with markers
+cannot be `accepted` (the pipeline refuses) — resolve them with the owner first.
+Promote a marker to a `Q-`/`ASMP-` note only when it spans several notes.
+
 ## Step 4 — VERIFY
 - The PostToolUse hook runs `node tools/validate.mjs` automatically. If it reports
   an error, fix the note until validation passes.
