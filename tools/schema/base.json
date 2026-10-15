@@ -90,6 +90,13 @@
           }
         }
       }
+    },
+    "validation": {
+      "enum": [
+        "open",
+        "validated",
+        "invalidated"
+      ]
     }
   }
 }

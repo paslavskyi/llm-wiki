@@ -10,6 +10,9 @@ _none_
 ### Open questions / risks / assumptions
 _none_
 
+### Invalidated assumptions still relied on
+_none_
+
 ### Decisions due for review
 _none_
 

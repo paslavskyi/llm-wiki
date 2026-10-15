@@ -10,6 +10,7 @@ import { checkMarkers } from '../lib/markers.mjs';
 import { checkRelations } from '../lib/relations.mjs';
 import { checkAcceptance } from '../lib/acceptance.mjs';
 import { checkDecision } from '../lib/decision.mjs';
+import { checkValidation } from '../lib/assumption.mjs';
 import { domainOf } from '../lib/domain.mjs';
 
 // STATE.md is intent-only (see CLAUDE.md → "STATE.md scope"): it must never hold
@@ -101,6 +102,7 @@ export async function validateNotes(rootDir) {
     for (const e of checkMarkers(fm, note.body)) errors.push(`${id}: ${e}`);
     for (const e of checkAcceptance(fm)) errors.push(`${id}: ${e}`);
     for (const e of checkDecision(fm, note.body)) errors.push(`${id}: ${e}`);
+    for (const e of checkValidation(fm)) errors.push(`${id}: ${e}`);
 
     if (!note.fileName.startsWith(`${id}-`) && note.fileName !== `${id}.md`) {
       errors.push(`${id}: filename "${note.fileName}" must start with the id`);

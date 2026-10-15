@@ -75,6 +75,12 @@ KB language. Pass plain strings; the pipeline numbers them `<ID>.<n>`. Make qual
 words measurable ("under 2 s at p95", not "fast"). Add `verify:` when the check
 isn't obvious.
 
+### Assumptions (ASMP-)
+New assumptions start `validation: open`. When evidence arrives (an interview,
+data, an experiment) record it as a `source` note and set `validation: validated`
+or `invalidated` with `sources: [SRC-…]`. On `invalidated`, check health's
+"Invalidated assumptions still relied on" and revise those notes (kb-evolve).
+
 ### Decision notes (DEC-, MADR)
 Frontmatter: `decided`, `deciders`, `consulted`, `informed`, optional `revisit`
 (when to re-check). Body, in this order:

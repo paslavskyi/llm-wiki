@@ -111,6 +111,14 @@ export async function buildHealth(rootDir, opts = {}) {
     .filter(d => d.missing.length)
     .map(d => `${d.id} — ${d.missing.join(', ')}`).sort();
 
+  // Tier 1.6 invalidated assumptions that live notes still reference
+  const liveIds = new Set(live.map(n => n.frontmatter.id));
+  const invalidated = live
+    .filter(n => n.frontmatter.type === 'assumption' && n.frontmatter.validation === 'invalidated')
+    .map(n => ({ id: n.frontmatter.id, from: [...new Set(backlinks.get(n.frontmatter.id) ?? [])].filter(s => liveIds.has(s)).sort() }))
+    .filter(a => a.from.length)
+    .sort((a, b) => a.id.localeCompare(b.id));
+
   // Tier 2.5 possible duplicates (opt-in)
   const dupes = [];
   if (opts.duplicates) {
@@ -145,6 +153,8 @@ export async function buildHealth(rootDir, opts = {}) {
   md += debt.length ? debt.map(d => `- ${d.deprecated} ← ${d.from.join(', ')}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Open questions / risks / assumptions\n`;
   md += open.length ? open.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
+  md += `\n### Invalidated assumptions still relied on\n`;
+  md += invalidated.length ? invalidated.map(a => `- ${a.id} ← ${a.from.join(', ')}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Decisions due for review\n`;
   md += dueDecisions.length ? dueDecisions.map(d => `- ${d}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Unresolved markers (inline clarifications / assumptions)\n`;
