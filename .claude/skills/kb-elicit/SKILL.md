@@ -51,6 +51,22 @@ Recurring concern? If the same risk/assumption/trade-off recurs across ≥2 note
 canonicalize it into ONE note and link the others to it — don't re-state the same
 thought in multiple bodies (see kb-capture "Recurring-concern check").
 
+### Clarify loop (resolve gaps — on request, or when the agenda is mostly gaps)
+1. Run `npm run clarify -- [--topic TOP-xxx]`: the ranked queue of open `Q-` notes
+   and inline markers (must-priority, referenced and blocking items first).
+2. Ask **at most 5** questions per round, **one at a time**, in queue order.
+   Each question offers a **recommended answer** (with a one-line why) plus 2–4
+   alternatives, or asks for a short free answer. Never batch them into a wall.
+3. After EACH answer, immediately write it through the pipeline:
+   - edit the affected note: replace the marker / contradicting text with the
+     answer (a resolved `Q-` → `status: accepted` with the answer in its body,
+     linked via `relations: { answers: [Q-…] }` from the note it settles);
+   - append to that note's body, under `## Clarifications` → `### YYYY-MM-DD`:
+     `- Q: <question> → A: <answer>` (append-only; the dated log of why it changed).
+4. Stop after 5, or when the owner says stop / defers. Deferred items stay as
+   markers / open `Q-` — never silently dropped. Report: resolved / deferred /
+   still open.
+
 ## Coverage / agenda (what to work on next)
 Compose, do not maintain a separate drifting artifact:
 1. Empty areas — from `index/MAP.md` (count 0).

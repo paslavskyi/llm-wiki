@@ -13,6 +13,7 @@
     "plan": "node tools/plan.mjs",
     "graph": "node tools/graph.mjs",
     "impact": "node tools/impact.mjs",
+    "clarify": "node tools/clarify.mjs",
     "install-hooks": "node tools/install-hooks.mjs"
   },
   "dependencies": {

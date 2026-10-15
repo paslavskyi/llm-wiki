@@ -171,6 +171,8 @@ its body; the live note states the current verdict.
   lines). Omit `frontmatter.id` for a new note — the next free id for the
   type is assigned and printed. For coherent multi-note writes/updates; a single note still goes via
   `kb-capture`. Avoids ad-hoc temp scripts and JS-string escaping pitfalls.
+- `npm run clarify -- [--topic TOP-x] [--limit N]` — ranked queue of open `Q-` notes
+  and inline markers for kb-elicit's clarify loop (read-only).
 - `npm run validate` — validate all notes (also runs automatically after writes).
 - `npm run reindex` — regenerate `index/` (also runs automatically at end of turn).
 - `npm run plan -- <show|take|done|drop|defer|promote|move|set>` — deterministic
