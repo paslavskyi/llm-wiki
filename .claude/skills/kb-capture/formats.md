@@ -59,7 +59,10 @@ Body sections in order: `## Context`, `## Considered Options`, `## Decision`,
 Рішення / Наслідки / Підтвердження). Accepted ⇒ Context, Decision, Consequences
 required. A changed decision records the supersession in its body; the live note
 states the current verdict. *(health)* missing Options/Confirmation; `revisit`
-date passed.
+date passed. A KB that adopted MADR late sets `decisions.madr_required_since` in
+`kb.config.yml`: decisions created before that date skip the required-sections gate
+and are listed in health as "Decisions predating MADR"; when you touch one, add the
+sections.
 
 ## Mind-map — TOP-
 `parent: TOP-… | null` (null = top-level area). Concrete notes attach via

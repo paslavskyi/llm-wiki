@@ -130,6 +130,12 @@ test('parseState extracts Phase, Current focus, and any Live tail section', () =
   assert.equal(s.liveTail, 'D');
 });
 
+test('parseState accepts a qualifier after the section name', () => {
+  const s = parseState('## Current focus — R&D plan (approved 2026-08-25)\nB\n\n## Next step\nN\n## Next steps for later\nX\n');
+  assert.equal(s.focus, 'B');
+  assert.equal(s.next, 'N');
+});
+
 test('monthlyTrend buckets created/updated by month and skips malformed dates', () => {
   const rows = monthlyTrend([
     { created: '2026-06-05', updated: '2026-07-01' },
