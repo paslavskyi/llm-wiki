@@ -12,8 +12,14 @@ const read = (p) => readFile(new URL(`../${p}`, import.meta.url), 'utf8');
 const MAX_LINES = 100;
 const MAX_BYTES = 6000;
 
-test(`CLAUDE.md stays within budget (${MAX_LINES} lines / ${MAX_BYTES} bytes)`, async () => {
-  const text = await read('CLAUDE.md');
+// A knowledge base may append its own always-on rules (operating model, relay)
+// below an `<!-- instance … -->` marker; the budget guards the engine core above it.
+const INSTANCE_MARKER = '<!-- instance';
+
+test(`CLAUDE.md engine core stays within budget (${MAX_LINES} lines / ${MAX_BYTES} bytes)`, async () => {
+  const full = await read('CLAUDE.md');
+  const cut = full.indexOf(INSTANCE_MARKER);
+  const text = cut === -1 ? full : full.slice(0, cut);
   const lines = text.trimEnd().split('\n').length;
   const bytes = Buffer.byteLength(text);
   assert.ok(lines <= MAX_LINES && bytes <= MAX_BYTES,
