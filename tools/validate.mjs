@@ -12,6 +12,7 @@ import { checkAcceptance } from '../lib/acceptance.mjs';
 import { checkDecision } from '../lib/decision.mjs';
 import { checkValidation } from '../lib/assumption.mjs';
 import { domainOf } from '../lib/domain.mjs';
+import { loadConfig } from '../lib/config.mjs';
 
 // STATE.md is intent-only (see CLAUDE.md → "STATE.md scope"): it must never hold
 // derived facts that already live — fresh — in index/MAP.md + index/health.md. A
@@ -51,6 +52,7 @@ export async function checkStateScope(rootDir) {
 
 export async function validateNotes(rootDir) {
   const errors = [];
+  const requiredSince = (await loadConfig(rootDir)).decisions?.madr_required_since;
   const { validatorFor } = await loadValidators();
   const files = await walkMarkdown(join(rootDir, 'knowledge'));
 
@@ -101,7 +103,7 @@ export async function validateNotes(rootDir) {
     for (const e of checkVocabulary(fm, domainOf(note.filePath))) errors.push(`${id}: ${e}`);
     for (const e of checkMarkers(fm, note.body)) errors.push(`${id}: ${e}`);
     for (const e of checkAcceptance(fm)) errors.push(`${id}: ${e}`);
-    for (const e of checkDecision(fm, note.body)) errors.push(`${id}: ${e}`);
+    for (const e of checkDecision(fm, note.body, { requiredSince })) errors.push(`${id}: ${e}`);
     for (const e of checkValidation(fm)) errors.push(`${id}: ${e}`);
 
     if (!note.fileName.startsWith(`${id}-`) && note.fileName !== `${id}.md`) {

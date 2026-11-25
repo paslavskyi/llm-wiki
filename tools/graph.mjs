@@ -10,7 +10,7 @@ import { EVIDENCE_TYPES } from '../lib/vocabulary.mjs';
 import { findMarkers } from '../lib/markers.mjs';
 import { computeCoverage } from '../lib/coverage.mjs';
 import { criterionForm, isVague } from '../lib/acceptance.mjs';
-import { decisionSections, RECOMMENDED_SECTIONS } from '../lib/decision.mjs';
+import { decisionSections, RECOMMENDED_SECTIONS, missingRequiredSections, isGrandfathered } from '../lib/decision.mjs';
 
 const BANNER = '<!-- GENERATED — do not edit by hand. Run: node tools/graph.mjs -->';
 
@@ -110,6 +110,13 @@ export async function buildHealth(rootDir, opts = {}) {
     })
     .filter(d => d.missing.length)
     .map(d => `${d.id} — ${d.missing.join(', ')}`).sort();
+  // Exempt from the validate gate (created before decisions.madr_required_since)
+  // but still short of the required sections: the backlog of the MADR migration.
+  const legacyDecisions = decisions
+    .filter(n => n.frontmatter.status === 'accepted' && isGrandfathered(n.frontmatter, opts.madrRequiredSince))
+    .map(n => ({ id: n.frontmatter.id, missing: missingRequiredSections(n.body) }))
+    .filter(d => d.missing.length)
+    .map(d => `${d.id} — ${d.missing.join(', ')}`).sort();
 
   // Tier 1.6 invalidated assumptions that live notes still reference
   const liveIds = new Set(live.map(n => n.frontmatter.id));
@@ -178,6 +185,10 @@ export async function buildHealth(rootDir, opts = {}) {
   md += vague.length ? vague.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Decisions without Considered Options / Confirmation\n`;
   md += thinDecisions.length ? thinDecisions.map(d => `- ${d}`).join('\n') + '\n' : '_none_\n';
+  if (opts.madrRequiredSince) {
+    md += `\n### Decisions predating MADR (missing required sections)\n`;
+    md += legacyDecisions.length ? legacyDecisions.map(d => `- ${d}`).join('\n') + '\n' : '_none_\n';
+  }
   md += `\n### Accepted claims without evidence\n`;
   md += unsupported.length ? unsupported.map(id => `- ${id}`).join('\n') + '\n' : '_none_\n';
   md += `\n### Unused sources\n`;
@@ -204,6 +215,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const opts = {
     duplicates: cliDup || cfg.health.duplicates.enabled,
     threshold: cfg.health.duplicates.threshold,
+    madrRequiredSince: cfg.decisions?.madr_required_since,
   };
   const out = await writeHealth(root, opts);
   console.log(`✓ generated ${out}`);
